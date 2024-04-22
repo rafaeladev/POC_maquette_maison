@@ -32,7 +32,7 @@ export default function Experience() {
     // console.log(model);
 
     // Model
-    const { nodes, materials } = useGLTF('./model/POC_Maquette.glb');
+    const { nodes, materials } = useGLTF('./model/POC_Maquette_v2.glb');
     // console.log(nodes);
     // console.log(nodes.Eau_interieur.position);
 

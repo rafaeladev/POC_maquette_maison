@@ -2,6 +2,7 @@ import './style.css';
 import ReactDOM from 'react-dom/client';
 import { Canvas } from '@react-three/fiber';
 import Experience from './Experience.jsx';
+import Scene from './Scene.jsx';
 
 const root = ReactDOM.createRoot(document.querySelector('#root'));
 
@@ -16,7 +17,7 @@ root.render(
                 position: [-18.8, 12.06, 9.58],
             }}
         >
-            <Experience />
+            <Scene />
         </Canvas>
         {/* <div className='interface'>
             <div
