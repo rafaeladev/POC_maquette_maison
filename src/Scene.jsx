@@ -42,7 +42,9 @@ function Scene() {
         if (action) {
             action.clampWhenFinished = true;
             action.setLoop(LoopOnce, 1);
+            action2.setLoop(LoopOnce, 1);
             action3.setLoop(LoopOnce, 1);
+            action2.clampWhenFinished = true;
             action3.clampWhenFinished = true;
             action.play();
             action2.play();
@@ -105,12 +107,18 @@ function Scene() {
             <ambientLight intensity={0.1} />
 
             {/* Affichage du modèle */}
-            {Object.keys(nodes).map((key) => (
-                <primitive
-                    key={key}
-                    object={nodes[key]}
-                />
-            ))}
+            {Object.keys(nodes).map((key) => {
+                if (key === 'Eau_exterieur' || key === 'Eau_piscine' || key === 'Eau_interieur') {
+                    nodes[key].material.transparent = true;
+                    nodes[key].material.opacity = 0.8;
+                }
+                return (
+                    <primitive
+                        key={key}
+                        object={nodes[key]}
+                    />
+                );
+            })}
 
             {/*  Cube */}
             <mesh
