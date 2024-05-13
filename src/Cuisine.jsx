@@ -7,7 +7,6 @@ import { useControls } from "leva";
 function Cuisine() {
   // Model
   const { nodes, animations } = useGLTF("./model/cuisine/POC_cuisine.glb");
-  console.log("nodes", nodes);
 
   const { cameraX, cameraY, cameraZ, cameraFov, cameraNear, cameraFar } =
     useControls({
@@ -19,9 +18,15 @@ function Cuisine() {
       cameraFar: { value: 200, step: 1, label: "Far" },
     });
 
+  const maquettePosition = useControls({
+    x: { value: 0, step: 0.1, label: "X" },
+    y: { value: 0, step: 0.1, label: "Y" },
+    z: { value: 0, step: 0.1, label: "Z" },
+  });
+
   const { camera } = useThree();
 
-  useFrame(() => {
+  useFrame((state) => {
     // Update camera position based on Leva controls
     camera.position.set(cameraX, cameraY, cameraZ);
     camera.fov = cameraFov;
@@ -29,6 +34,8 @@ function Cuisine() {
     camera.far = cameraFar;
 
     camera.updateProjectionMatrix();
+
+    /* console.log(state.scene.position); */
   });
 
   return (
@@ -37,9 +44,13 @@ function Cuisine() {
 
       <color args={["#241B27"]} attach="background" />
       <OrbitControls makeDefault />
-      {Object.keys(nodes).map((key) => {
-        return <primitive key={key} object={nodes[key]} />;
-      })}
+      <group
+        position={[maquettePosition.x, maquettePosition.y, maquettePosition.z]}
+      >
+        {Object.keys(nodes).map((key) => {
+          return <primitive key={key} object={nodes[key]} />;
+        })}
+      </group>
     </>
   );
 }
