@@ -1,18 +1,20 @@
 import React, { useMemo, useRef } from 'react';
 import { useGLTF, OrbitControls, Environment, PresentationControls } from '@react-three/drei';
-import { useFrame, useThree } from '@react-three/fiber';
+import { useFrame, useThree, useLoader } from '@react-three/fiber';
 
 import { useControls } from 'leva';
+
+import { TextureLoader } from 'three';
 
 function Cuisine() {
     const controls = useRef();
     // Model
     const { nodes, animations } = useGLTF('./model/cuisine/POC_cuisine.glb');
 
-    // Leva controls - debug UI
+    // ------------ Leva UI ------------ //
     const { cameraX, cameraY, cameraZ, cameraFov, cameraNear, cameraFar } = useControls('Camera', {
-        cameraX: { value: 2.6, step: 0.1, label: 'Camera X' },
-        cameraY: { value: 1.6, step: 0.1, label: 'Camera Y' },
+        cameraX: { value: 6.2, step: 0.1, label: 'Camera X' },
+        cameraY: { value: 2, step: 0.1, label: 'Camera Y' },
         cameraZ: { value: 4.2, step: 0.1, label: 'Camera Z' },
         cameraFov: { value: 40, step: 1, label: 'FOV' },
         cameraNear: { value: 1.4, step: 0.1, label: 'Near' },
@@ -51,7 +53,7 @@ function Cuisine() {
         // screenSpacePanning: true,
         // keyPanSpeed: 7,
         // dynamicDampingFactor: 0.2,
-        target: [1.1, 0.95, 0.2],
+        target: [5.5, 1, 0.2],
         // position: [2.6, 1.6, 4.2],
     });
 
@@ -62,15 +64,14 @@ function Cuisine() {
     useFrame((state) => {
         // Update camera position based on Leva controls
         camera.position.set(cameraX, cameraY, cameraZ);
-        // camera.fov = cameraFov;
-        // camera.near = cameraNear;
-        // camera.far = cameraFar;
         camera.updateProjectionMatrix();
-        /* console.log(state.scene.position); */
-        // console.log(state.camera.position);
-        // console.log(controls.current.target);
-        // console.log(controls.current);
     });
+
+    // Texture
+    // const crasseMurs = useLoader(TextureLoader, '/textures/crasse_murs.jpg');
+    // const facadeCuisineSale = useLoader(TextureLoader, '/textures/facade_cuisine_sale.jpg');
+    // const solCuisineSale = useLoader(TextureLoader, '/textures/sol_cuisine_sale.jpg');
+    // const boisSale = useLoader(TextureLoader, '/textures/texture_bois_sale.jpg');
 
     const objetAbimes = [
         'Salissure_interieure',
@@ -99,19 +100,48 @@ function Cuisine() {
         'Plans_de_travail',
     ];
 
+    const chaises = [
+        'Chaise_cuisine_01',
+        'Chaise_cuisine_02',
+        'Chaise_cuisine_03',
+        'Chaise_cuisine_04',
+        'Chaise_cuisine_05',
+        'Chaise_cuisine_06',
+    ];
+    const table = 'Table_cuisine';
+    const sol = 'Sol_cuisine';
+    const plansDeTravail = 'Plans_de_travail';
+
     const cleanMaterials = ['façade_cuisine_propre'];
 
     const eauMesh = ['Eau_interieur', 'Eau_lavabos'];
 
-    const testArray = Object.keys(nodes).filter((key) => !objetAbimes.includes(key));
+    const objetsPasAbimes = Object.keys(nodes).filter((key) => !objetAbimes.includes(key));
 
     const eauArray = Object.keys(nodes).filter((key) => eauMesh.includes(key));
-    const objetsArray = Object.keys(nodes).filter((key) => objetVariables.includes(key));
+    const objetsVariablesArray = Object.keys(nodes).filter((key) => objetVariables.includes(key));
 
     const arrayOfNodes = useMemo(() => {
-        return testArray.map((key) => {
-            if (nodes[key].material) {
-                // console.log(nodes[key].material);
+        return objetsPasAbimes.map((key) => {
+            console.log(key, nodes[key]);
+            if (objetsVariablesArray.includes(key)) {
+                return (
+                    <primitive
+                        key={key}
+                        object={nodes[key]}
+                    >
+                        <meshStandardMaterial
+                            // map={texture}
+                            color={`${
+                                key === table || chaises.includes(key) || key === plansDeTravail
+                                    ? '#4B3F39'
+                                    : '#4B3F39'
+                            }`} // Applique une couleur sur la texture
+                            opacity={1} // Définit l'opacité du matériau
+                            transparent={false} // Nécessaire pour que l'opacité prenne effet
+                        />
+                    </primitive>
+                );
             }
 
             return (
@@ -121,7 +151,7 @@ function Cuisine() {
                 />
             );
         });
-    }, [testArray, nodes]);
+    }, [objetsPasAbimes, nodes]);
 
     return (
         <>
@@ -176,9 +206,9 @@ function Cuisine() {
                 azimuth={[-Infinity, Infinity]} // Horizontal limits
                 config={{ mass: 1, tension: 170, friction: 26 }} // Spring config
             > */}
-            {/* <group position={[maquettePosition.x, maquettePosition.y, maquettePosition.z]}> */}
+
             {arrayOfNodes}
-            {/* </group> */}
+
             {/* </PresentationControls> */}
         </>
     );
