@@ -1,4 +1,4 @@
-import React, { useMemo, useRef, useEffect, useState } from "react";
+import React, { useMemo, useRef, useEffect, useState, Suspense } from "react";
 import {
   useGLTF,
   OrbitControls,
