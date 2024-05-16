@@ -65,8 +65,8 @@ function Cuisine(props) {
     // Approche n°1 avec shaderMaterial
 
     const { depthColor, surfaceColor } = useControls({
-        depthColor: '#60baeb',
-        surfaceColor: '#bfd6ff',
+        depthColor: '#5e98ba',
+        surfaceColor: '#c1def5',
     });
 
     const {
@@ -81,15 +81,15 @@ function Cuisine(props) {
         uColorOffset,
         uColorMultiplier,
     } = useControls({
-        uBigWavesElevation: { value: 0.24, min: 0, max: 1, step: 0.001 },
-        uBigWavesFrequencyX: { value: 2.6, min: 0, max: 10, step: 0.001 },
-        uBigWavesFrequencyY: { value: 2, min: 0, max: 10, step: 0.001 },
-        uBigWavesSpeed: { value: 0.82, min: 0, max: 4, step: 0.001 },
+        uBigWavesElevation: { value: 0.02, min: 0, max: 1, step: 0.001 },
+        uBigWavesFrequencyX: { value: 2.5, min: 0, max: 10, step: 0.001 },
+        uBigWavesFrequencyY: { value: 2.5, min: 0, max: 10, step: 0.001 },
+        uBigWavesSpeed: { value: 1.72, min: 0, max: 4, step: 0.001 },
 
-        uSmallWavesElevation: { value: 0.19, min: 0, max: 1, step: 0.001 },
-        uSmallWavesFrequency: { value: 11, min: 0, max: 30, step: 0.001 },
-        uSmallWavesSpeed: { value: 0.2, min: 0, max: 4, step: 0.001 },
-        uSmallIterations: { value: 4, min: 0, max: 5, step: 1 },
+        uSmallWavesElevation: { value: 0.07, min: 0, max: 1, step: 0.001 },
+        uSmallWavesFrequency: { value: 2.43, min: 0, max: 30, step: 0.001 },
+        uSmallWavesSpeed: { value: 0.97, min: 0, max: 4, step: 0.001 },
+        uSmallIterations: { value: 1, min: 0, max: 5, step: 1 },
         uColorOffset: { value: 0.08, min: 0, max: 1, step: 0.001 },
         uColorMultiplier: { value: 5, min: 0, max: 10, step: 0.001 },
     });
