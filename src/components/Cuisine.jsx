@@ -334,10 +334,6 @@ function Cuisine(props) {
   }, [objetsPasAbimes, nodes]);
 
   // Animation niveau d'eau
-  const [isAnimationEnd, setIsAnimationEnd] = useState(false);
-  const toggleIsAnimationEnd = () => {
-    setIsAnimationEnd((prev) => !prev);
-  };
 
   const animationsClips = [
     useAnimations(animations, nodes.Eau_exterieur),
@@ -354,8 +350,6 @@ function Cuisine(props) {
       window.setTimeout(() => {
         props.toggleScenario(true);
         props.toggleAnimation(false);
-
-        setIsAnimationEnd(true);
       }, 5000);
     } else if (props.isWaterMoving && !props.isWaterMovingUp) {
       startAnimation("eauExterieur0To80", animationsClips[0], true);
@@ -363,18 +357,13 @@ function Cuisine(props) {
       startAnimation("eauInterieur0to80", animationsClips[2], true);
       window.setTimeout(() => {
         props.toggleAnimation(false);
-        setIsAnimationEnd(true);
       }, 5000);
     }
-    // } else if (!props.isWaterMoving && props.isScenarioChanged) {
-    //     console.log('je suis la');
-    //     props.toggleScenario(false);
-    // }
   }, [props.isWaterMoving]);
 
   useFrame(({ clock }) => {
-    /*  eauExterieur.current.material.uniforms.uTime.value = clock.getElapsedTime();
-    eauInterieur.current.material.uniforms.uTime.value = clock.getElapsedTime();*/
+    eauExterieur.current.material.uniforms.uTime.value = clock.getElapsedTime();
+    eauInterieur.current.material.uniforms.uTime.value = clock.getElapsedTime();
     eauPiscine.current.material.uniforms.uTime.value = clock.getElapsedTime();
     /*  console.log(tableRef.current); */
     // if (isAnimationEnd === true) {
