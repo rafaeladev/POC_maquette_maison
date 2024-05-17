@@ -237,7 +237,7 @@ function Cuisine(props) {
   const eauExterieur = useRef();
   const tableRef = useRef();
   const directionalLight = useRef();
-  useHelper(directionalLight, THREE.DirectionalLightHelper, 1);
+  /* useHelper(directionalLight, THREE.DirectionalLightHelper, 1); */
 
   const { scene } = useThree();
 
