@@ -1,85 +1,103 @@
-import React, { useEffect, useState, Suspense } from 'react';
+import React, { useEffect, useState, Suspense } from "react";
 
-import { Canvas } from '@react-three/fiber';
-import { Leva } from 'leva';
+import { Canvas } from "@react-three/fiber";
+import { Leva } from "leva";
+import { Sky } from "@react-three/drei";
 
-import Interface from '../components/Interface.jsx';
-import Cuisine from '../components/Cuisine.jsx';
-import LoadingBar from '../components/LoadingBar.jsx';
+import Interface from "../components/Interface.jsx";
+import Cuisine from "../components/Cuisine.jsx";
+import LoadingBar from "../components/LoadingBar.jsx";
+
+import { useControls } from "leva";
 
 function Home() {
-    const [isScenarioChanged, setIsScenarioChanged] = useState(false);
-    const [isWaterMoving, setIsWaterMoving] = useState(false);
-    const [isWaterMovingUp, setIsWaterMovingUp] = useState(false);
+  const [isScenarioChanged, setIsScenarioChanged] = useState(false);
+  const [isWaterMoving, setIsWaterMoving] = useState(false);
+  const [isWaterMovingUp, setIsWaterMovingUp] = useState(false);
 
-    const toggleWaterMovingUp = () => {
-        setIsWaterMovingUp((prev) => !prev);
-    };
+  const toggleWaterMovingUp = () => {
+    setIsWaterMovingUp((prev) => !prev);
+  };
 
-    const toggleWaterMoving = () => {
-        setIsWaterMoving((prev) => !prev);
-    };
+  const toggleWaterMoving = () => {
+    setIsWaterMoving((prev) => !prev);
+  };
 
-    const toggleScenario = () => {
-        setIsScenarioChanged((prev) => !prev); // Toggle entre true et false
-    };
+  const toggleScenario = () => {
+    setIsScenarioChanged((prev) => !prev); // Toggle entre true et false
+  };
 
-    const [isLoading, setIsLoading] = useState(true);
-    const [progress, setProgress] = useState(0);
+  /*  const { dLightPosition, dLightIntensity } = useControls("Directional Light", {
+    dLightPosition: { value: [0, 10, 0], step: 0.1 },
+    dLightIntensity: { value: 1, step: 0.1 },
+  });
+ */
+  /* const { sLightPosition, sLightAngle, sLightPenumbra } = useControls(
+    "Spot Light",
+    {
+      sLightPosition: { value: [10, 10, 10], step: 0.1 },
+      sLightAngle: { value: 0.15, step: 0.1 },
+      sLightPenumbra: { value: 1, step: 0.1 },
+    }
+  ); */
 
-    // useEffect(() => {
-    //     const interval = setInterval(() => {
-    //         setProgress((prev) => {
-    //             if (prev < 1) {
-    //                 return prev + 0.1;
-    //             } else {
-    //                 clearInterval(interval);
-    //                 setIsLoading(false);
-    //                 return 1;
-    //             }
-    //         });
-    //     }, 1000);
-    //     return () => clearInterval(interval);
-    // }, []);
+  return (
+    <>
+      {/* <LoadingBar isLoading={isLoading} progress={progress} /> */}
 
-    return (
-        <>
-            {/* <LoadingBar isLoading={isLoading} progress={progress} /> */}
-            <Leva
-                hidden={false}
-                collapsed={true}
+      <Leva hidden={false} collapsed={true} />
+
+      {/* {!isLoading && ( */}
+      <div className="webgl">
+        <Canvas
+          shadows
+          flat
+          camera={{
+            fov: 45,
+            near: 0.1,
+            far: 200,
+            position: [-18.8, 12.06, 9.58],
+          }}
+        >
+          <ambientLight intensity={0.5} />
+          {/*  <directionalLight
+            position={dLightPosition}
+            intensity={dLightIntensity}
+            castShadow
+          /> */}
+          {/*   <spotLight
+            position={sLightPosition}
+            angle={sLightAngle}
+            penumbra={sLightPenumbra}
+            castShadow
+          /> */}
+          <Suspense fallback={null}>
+            <Cuisine
+              isScenarioChanged={isScenarioChanged}
+              toggleScenario={toggleScenario}
+              toggleAnimation={toggleWaterMoving}
+              isWaterMoving={isWaterMoving}
+              isWaterMovingUp={isWaterMovingUp}
             />
-            {/* {!isLoading && ( */}
-            <div className='webgl'>
-                <Suspense fallback={<LoadingBar />}>
-                    <Canvas
-                        flat
-                        camera={{
-                            fov: 45,
-                            near: 0.1,
-                            far: 200,
-                            position: [-18.8, 12.06, 9.58],
-                        }}
-                    >
-                        <Cuisine
-                            isScenarioChanged={isScenarioChanged}
-                            toggleScenario={toggleScenario}
-                            toggleAnimation={toggleWaterMoving}
-                            isWaterMoving={isWaterMoving}
-                            isWaterMovingUp={isWaterMovingUp}
-                        />
-                    </Canvas>
-                    <Interface
-                        toggleWaterMovingUp={toggleWaterMovingUp}
-                        toggleWaterMoving={toggleWaterMoving}
-                        isWaterMovingUp={isWaterMovingUp}
-                        isWaterMoving={isWaterMoving}
-                        isScenarioChanged={isScenarioChanged}
-                    />
-                </Suspense>
-            </div>
-            {/* )} */}
-        </>
-    );
+          </Suspense>
+          {/*  <Sky
+             distance={450000}
+            sunPosition={[0, 1, 0]}
+            inclination={0}
+            azimuth={0.25} 
+          /> */}
+        </Canvas>
+
+        <Interface
+          toggleWaterMovingUp={toggleWaterMovingUp}
+          toggleWaterMoving={toggleWaterMoving}
+          isWaterMovingUp={isWaterMovingUp}
+          isWaterMoving={isWaterMoving}
+          isScenarioChanged={isScenarioChanged}
+        />
+      </div>
+      {/* )} */}
+    </>
+  );
 }
 export default Home;
