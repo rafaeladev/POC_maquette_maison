@@ -17,6 +17,7 @@ function Home() {
   const [isScenarioChanged, setIsScenarioChanged] = useState(false);
   const [isWaterMoving, setIsWaterMoving] = useState(false);
   const [isWaterMovingUp, setIsWaterMovingUp] = useState(false);
+  const [isReset, setIsReset] = useState(false);
 
   const toggleWaterMovingUp = () => {
     setIsWaterMovingUp((prev) => !prev);
@@ -28,6 +29,10 @@ function Home() {
 
   const toggleScenario = () => {
     setIsScenarioChanged((prev) => !prev); // Toggle entre true et false
+  };
+
+  const handleReset = () => {
+    setIsReset((prev) => !prev);
   };
 
   /*  const { dLightPosition, dLightIntensity } = useControls("Directional Light", {
@@ -98,6 +103,7 @@ function Home() {
               toggleAnimation={toggleWaterMoving}
               isWaterMoving={isWaterMoving}
               isWaterMovingUp={isWaterMovingUp}
+              isReset={isReset}
             />
           </Suspense>
           {/* <Sky
@@ -114,6 +120,7 @@ function Home() {
           isWaterMovingUp={isWaterMovingUp}
           isWaterMoving={isWaterMoving}
           isScenarioChanged={isScenarioChanged}
+          handleReset={handleReset}
         />
       </div>
       {/* )} */}

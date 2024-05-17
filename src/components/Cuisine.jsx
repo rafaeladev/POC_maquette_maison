@@ -110,11 +110,11 @@ function Cuisine(props) {
   const { camera } = useThree();
 
   // tick function for camera
-  /*   useFrame((state) => {
+  useFrame((state) => {
     // Update camera position based on Leva controls
     camera.position.set(cameraX, cameraY, cameraZ);
     camera.updateProjectionMatrix();
-  }); */
+  });
 
   // Shader material
   const fragmentShader = waterFragmentShader;
@@ -239,6 +239,15 @@ function Cuisine(props) {
   const directionalLight = useRef();
   useHelper(directionalLight, THREE.DirectionalLightHelper, 1);
 
+  const { scene } = useThree();
+
+  useEffect(() => {
+    if (directionalLight.current) {
+      directionalLight.current.target.position.set(5, 0, 0);
+      scene.add(directionalLight.current.target);
+    }
+  }, []);
+
   const objetsScene = useMemo(() => {
     return objetsPasAbimes.map((key, index) => {
       if (key === "Scene") {
@@ -274,7 +283,8 @@ function Cuisine(props) {
           />
         );
       }
-      if (!props.isScenarioChanged) {
+      if (!props.isScenarioChanged || props.isReset) {
+        props.toggleScenario(false);
         if (key === "cuisine_sol_intact") {
           return (
             <primitive
@@ -385,7 +395,7 @@ function Cuisine(props) {
     shadowBottom,
     shadowLeft,
   } = useControls("Directional Light", {
-    dLightPosition: { value: [13.5, 5.5, 1.6], step: 0.1 },
+    dLightPosition: { value: [4.3, 5.3, 10.7], step: 0.1 },
     dLightIntensity: { value: 0.5, step: 0.1 },
     shadowNear: { value: 1, step: 0.1 },
     shadowFar: { value: 10, step: 0.1 },
@@ -421,10 +431,10 @@ function Cuisine(props) {
         /> 
       </AccumulativeShadows> */}
       <color args={["#241B27"]} attach="background" />
-      <OrbitControls makeDefault />
+      {/*   <OrbitControls makeDefault /> */}
       {/*    <BakeShadows /> */}
       {/*  <SoftShadows size={25} samples={10} focus={0} /> */}
-      {/*   <OrbitControls
+      <OrbitControls
         ref={controls}
         enableZoom={orbitControls.enableZoom}
         enableRotate={orbitControls.enableRotate}
@@ -433,7 +443,7 @@ function Cuisine(props) {
         minDistance={orbitControls.minDistance}
         maxDistance={orbitControls.maxDistance}
         target={orbitControls.target}
-      /> */}
+      />
       {/* <PresentationControls
                 enabled={true} // the controls can be disabled by setting this to false
                 global={false} // Spin globally or by dragging the model
