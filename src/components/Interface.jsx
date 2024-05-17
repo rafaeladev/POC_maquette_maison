@@ -11,15 +11,13 @@ function Interface(props) {
       // Call a different function when the button says "Reset"
       props.handleReset(true); // Assuming `handleReset` is the function you want to call
     } else {
-      // Otherwise, proceed with the original logic
-      if (props.isWaterMovingUp) {
+      props.toggleWaterMoving(true);
+
+      if (props.isScenarioChanged) {
         props.toggleWaterMovingUp(false);
       } else if (!props.isScenarioChanged) {
         props.toggleWaterMovingUp(true);
-      } else {
-        props.toggleScenario(false);
       }
-      props.toggleWaterMoving(true);
     }
   };
   return (

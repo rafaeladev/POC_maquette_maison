@@ -170,7 +170,14 @@ function Cuisine(props) {
 
   const objetAbimes = [
     { nom: "cuisine_plan_de_travail_abime", shadow: 1 },
+    { nom: "cuisine_plan_de_travail_abime_1", shadow: 1 },
+    { nom: "cuisine_plan_de_travail_abime_2", shadow: 1 },
+    { nom: "cuisine_plan_de_travail_abime_3", shadow: 1 },
+    { nom: "cuisine_plan_de_travail_abime_4", shadow: 1 },
+    { nom: "cuisine_plan_de_travail_abime_5", shadow: 1 },
     { nom: "cuisine_frigo_porte_abime", shadow: 1 },
+    { nom: "cuisine_frigo_porte_abime_1", shadow: 1 },
+    { nom: "cuisine_frigo_porte_abime_2", shadow: 1 },
     { nom: "cuisine_table_et_chaises_abime", shadow: 1 },
     { nom: "cuisine_sol_abime", shadow: 0 },
     { nom: "Salissure_interieure", shadow: 0 },
@@ -284,7 +291,11 @@ function Cuisine(props) {
         );
       }
       if (!props.isScenarioChanged || props.isReset) {
-        props.toggleScenario(false);
+        /*  props.toggleScenario(true); */
+
+        /*  if (props.isReset) {
+          props.toggleReset(false);
+        } */
         if (key === "cuisine_sol_intact") {
           return (
             <primitive
@@ -304,19 +315,6 @@ function Cuisine(props) {
         }
       } else {
         return objetAbimes.map((key, index) => {
-          console.log(key.nom, nodes[key.nom]);
-          console.log(
-            <primitive
-              key={`${key}-${index}`}
-              object={nodes[key.nom]}
-              castShadow={
-                key.shadow === 1 ? true : key.shadow === 2 ? true : false
-              }
-              receiveShadow={
-                key.shadow === 0 ? true : key.shadow === 2 ? true : false
-              }
-            />
-          );
           return (
             <primitive
               key={`${key}-${index}`}

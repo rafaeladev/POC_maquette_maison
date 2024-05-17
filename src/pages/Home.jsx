@@ -20,6 +20,7 @@ function Home() {
   const [isReset, setIsReset] = useState(false);
 
   const toggleWaterMovingUp = () => {
+    setIsReset(false);
     setIsWaterMovingUp((prev) => !prev);
   };
 
@@ -33,6 +34,9 @@ function Home() {
 
   const handleReset = () => {
     setIsReset((prev) => !prev);
+    setIsScenarioChanged(false);
+    setIsWaterMoving(false);
+    setIsWaterMovingUp(false);
   };
 
   /*  const { dLightPosition, dLightIntensity } = useControls("Directional Light", {
@@ -103,6 +107,7 @@ function Home() {
               toggleAnimation={toggleWaterMoving}
               isWaterMoving={isWaterMoving}
               isWaterMovingUp={isWaterMovingUp}
+              toggleReset={handleReset}
               isReset={isReset}
             />
           </Suspense>
