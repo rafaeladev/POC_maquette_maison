@@ -155,64 +155,79 @@ function Cuisine(props) {
     ]
   );
 
+  //0 receiveShadow, 1 castShadow, 2 receiveShadow et castShadow
   const objetInchangeables = [
-    "Murs",
-    "Sol_salon",
-    "Sol_sdb",
-    "Cloisons",
-    "Piscine",
-    "Terrain",
-    "Bordure_maquette",
-    "cuisine_frigo_intact_1",
-    "cuisine_frigo_intact_2",
+    { nom: "Murs", shadow: 2 },
+    { nom: "Sol_salon", shadow: 0 },
+    { nom: "Sol_sdb", shadow: 0 },
+    { nom: "Cloisons", shadow: 2 },
+    { nom: "Piscine", shadow: 0 },
+    { nom: "Terrain", shadow: 0 },
+    { nom: "Bordure_maquette", shadow: 0 },
+    { nom: "cuisine_frigo_intact_1", shadow: 0 },
+    { nom: "cuisine_frigo_intact_2", shadow: 0 },
   ];
 
   const objetAbimes = [
-    "cuisine_plan_de_travail_abime",
-    "cuisine_frigo_porte_abime",
-    "cuisine_table_et_chaises_abime",
-    "cuisine_sol_abime",
-    "Salissure_interieure",
-    "Murs",
-
-    /*  "Scene", */ // ne pas oublier de retirer la scène
+    { nom: "cuisine_plan_de_travail_abime", shadow: 1 },
+    { nom: "cuisine_frigo_porte_abime", shadow: 1 },
+    { nom: "cuisine_table_et_chaises_abime", shadow: 1 },
+    { nom: "cuisine_sol_abime", shadow: 0 },
+    { nom: "Salissure_interieure", shadow: 0 },
   ];
 
   const eauMesh = ["Eau_interieur", "Eau_exterieur", "Eau_piscine"];
 
   // Fonction pour ajouter les enfants d'un objet à la liste des objets abîmés si l'objet est un groupe
-  const ajouterEnfantsSiGroupe = (key, nodes) => {
-    if (nodes[key] && nodes[key].children) {
-      nodes[key].children.forEach((child) => {
-        objetAbimes.push(child.name);
-        ajouterEnfantsSiGroupe(child.name, nodes);
+  const ajouterEnfantsSiGroupe = (item, nodes) => {
+    if (nodes[item.nom] && nodes[item.nom].children) {
+      nodes[item.nom].children.forEach((child) => {
+        // Vérifiez si l'enfant est déjà inclus pour éviter les doublons
+        if (!objetAbimes.some((e) => e.nom === child.name)) {
+          objetAbimes.push({ nom: child.name, shadow: item.shadow }); // Assumer le même état d'ombre que le parent
+          ajouterEnfantsSiGroupe(
+            { nom: child.name, shadow: item.shadow },
+            nodes
+          );
+        }
       });
     }
   };
 
   // Ajouter les enfants des objets abîmés
-  objetAbimes.forEach((key) => {
-    ajouterEnfantsSiGroupe(key, nodes);
+  objetAbimes.forEach((item) => {
+    ajouterEnfantsSiGroupe(item, nodes);
   });
 
-  objetInchangeables.forEach((key) => {
-    ajouterEnfantsSiGroupe(key, nodes);
+  objetInchangeables.forEach((item) => {
+    ajouterEnfantsSiGroupe(item, nodes);
   });
 
   // Array d'objets qui ne sont pas abîmés pour afficher scénario default
   const objetsPasAbimes = Object.keys(nodes).filter(
-    (key) => !objetAbimes.includes(key) && !objetInchangeables.includes(key)
+    (key) =>
+      !objetAbimes.some((item) => item.nom === key) &&
+      !objetInchangeables.some((item) => item.nom === key)
   );
 
-  // Array d'objets qui sont des mesh d'eau
-  const eauArray = Object.keys(nodes).filter((key) => eauMesh.includes(key));
+  /*   // Array d'objets qui sont des mesh d'eau
+  const eauArray = Object.keys(nodes).filter((key) => eauMesh.includes(key)); */
 
   const objetsInchangeables = useMemo(() => {
-    return objetInchangeables.map((key, index) => {
-      /* console.log(key, nodes[key]); */
+    return objetInchangeables.map((item, index) => {
       return (
-        <primitive key={`${key}-${index}`} object={nodes[key]} /> //receiveShadow
+        <primitive
+          key={`${item.nom}-${index}`}
+          object={nodes[item.nom]}
+          castShadow={
+            item.shadow === 1 ? true : item.shadow === 2 ? true : false
+          }
+          receiveShadow={
+            item.shadow === 0 ? true : item.shadow === 2 ? true : false
+          }
+        />
       );
+      /* } */
     });
   }, [nodes, objetInchangeables]);
 
@@ -228,14 +243,16 @@ function Cuisine(props) {
     return objetsPasAbimes.map((key, index) => {
       if (key === "Scene") {
         return;
-      } else if (
+      }
+
+      if (
         key === "Eau_exterieur" ||
         key === "Eau_piscine" ||
         key === "Eau_interieur"
       ) {
         return (
           <primitive
-            key={key}
+            key={`${key}-${index}`}
             object={nodes[key]}
             ref={
               key === "Eau_exterieur"
@@ -249,19 +266,24 @@ function Cuisine(props) {
           </primitive>
         );
       } else if (key === "Eau_evier_cuisine") {
-        return <primitive key={key} object={nodes[key]} visible={false} />;
-      } else if (key === "cuisine_sol_intact") {
-        return <primitive key={key} object={nodes[key]} />; //receiveShadow
+        return (
+          <primitive
+            key={`${key}-${index}`}
+            object={nodes[key]}
+            visible={false}
+          />
+        );
       }
-
-      if (props.isScenarioChanged) {
-        return objetAbimes.map((key, index) => {
-          if (key === "Scene") {
-            return;
-          } else if (key === "cuisine_sol_abime") {
-            /*     console.log(key, nodes[key]); */
-            return <primitive key={key} object={nodes[key]} />; //receiveShadow
-          } /*    console.log(key, nodes[key]); */
+      if (!props.isScenarioChanged) {
+        if (key === "cuisine_sol_intact") {
+          return (
+            <primitive
+              key={`${key}-${index}`}
+              object={nodes[key]}
+              receiveShadow
+            />
+          ); //receiveShadow
+        } else {
           return (
             <primitive
               key={`${key}-${index}`}
@@ -269,16 +291,37 @@ function Cuisine(props) {
               castShadow
             ></primitive>
           );
+        }
+      } else {
+        return objetAbimes.map((key, index) => {
+          console.log(key.nom, nodes[key.nom]);
+          console.log(
+            <primitive
+              key={`${key}-${index}`}
+              object={nodes[key.nom]}
+              castShadow={
+                key.shadow === 1 ? true : key.shadow === 2 ? true : false
+              }
+              receiveShadow={
+                key.shadow === 0 ? true : key.shadow === 2 ? true : false
+              }
+            />
+          );
+          return (
+            <primitive
+              key={`${key}-${index}`}
+              object={nodes[key.nom]}
+              castShadow={
+                key.shadow === 1 ? true : key.shadow === 2 ? true : false
+              }
+              receiveShadow={
+                key.shadow === 0 ? true : key.shadow === 2 ? true : false
+              }
+            />
+          ); //receiveShadow
+          /*    console.log(key, nodes[key]); */
         });
       }
-      /*  console.log(key, nodes[key]); */
-      return (
-        <primitive
-          key={`${key}-${index}`}
-          object={nodes[key]}
-          castShadow
-        ></primitive>
-      );
     });
   }, [objetsPasAbimes, nodes]);
 
@@ -322,10 +365,9 @@ function Cuisine(props) {
   }, [props.isWaterMoving]);
 
   useFrame(({ clock }) => {
-    eauExterieur.current.material.uniforms.uTime.value = clock.getElapsedTime();
-    eauInterieur.current.material.uniforms.uTime.value = clock.getElapsedTime();
+    /*  eauExterieur.current.material.uniforms.uTime.value = clock.getElapsedTime();
+    eauInterieur.current.material.uniforms.uTime.value = clock.getElapsedTime();*/
     eauPiscine.current.material.uniforms.uTime.value = clock.getElapsedTime();
-
     /*  console.log(tableRef.current); */
     // if (isAnimationEnd === true) {
     //   eauExterieur.current.visible = false;
@@ -343,8 +385,8 @@ function Cuisine(props) {
     shadowBottom,
     shadowLeft,
   } = useControls("Directional Light", {
-    dLightPosition: { value: [5.5, 5.5, 1.6], step: 0.1 },
-    dLightIntensity: { value: 1, step: 0.1 },
+    dLightPosition: { value: [13.5, 5.5, 1.6], step: 0.1 },
+    dLightIntensity: { value: 0.5, step: 0.1 },
     shadowNear: { value: 1, step: 0.1 },
     shadowFar: { value: 10, step: 0.1 },
     shadowTop: { value: 5, step: 0.1 },
@@ -363,34 +405,21 @@ function Cuisine(props) {
         castShadow
         shadow-mapSize={[2048, 2048]}
       />
-      <AccumulativeShadows
+      {/*     <AccumulativeShadows
         position={[2, 0.01, 0]}
         scale={15}
         opacity={0.8}
         frames={100}
         temporal
       >
-        <directionalLight
-          ref={directionalLight}
-          position={dLightPosition}
-          intensity={dLightIntensity}
-          castShadow
-          shadow-mapSize={[2048, 2048]}
-          /*   shadow-camera-near={shadowNear}
-        shadow-camera-far={shadowFar}
-        shadow-camera-top={shadowTop}
-        shadow-camera-right={shadowRight}
-        shadow-camera-bottom={shadowBottom}
-        shadow-camera-left={shadowLeft} */
-        />
-        {/*  <RandomizedLight
+           <RandomizedLight
           amount={8}
           radius={1}
           ambient={0.5}
           intensity={3}
           position={dLightPosition}
-        /> */}
-      </AccumulativeShadows>
+        /> 
+      </AccumulativeShadows> */}
       <color args={["#241B27"]} attach="background" />
       <OrbitControls makeDefault />
       {/*    <BakeShadows /> */}

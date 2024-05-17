@@ -3,10 +3,13 @@ import React, { useEffect, useState, Suspense } from "react";
 import { Canvas } from "@react-three/fiber";
 import { Leva } from "leva";
 import { Sky } from "@react-three/drei";
+import { Environment } from "@react-three/drei";
 
 import Interface from "../components/Interface.jsx";
 import Cuisine from "../components/Cuisine.jsx";
 import LoadingBar from "../components/LoadingBar.jsx";
+
+import { Perf } from "r3f-perf";
 
 import { useControls } from "leva";
 
@@ -41,6 +44,14 @@ function Home() {
     }
   ); */
 
+  const { envMapIntensity, envMapHeight, envMapRadius, envMapScale } =
+    useControls("environment map", {
+      envMapIntensity: { value: 7, min: 0, max: 12 },
+      envMapHeight: { value: 7, min: 0, max: 100 },
+      envMapRadius: { value: 28, min: 10, max: 1000 },
+      envMapScale: { value: 100, min: 10, max: 1000 },
+    });
+
   return (
     <>
       {/* <LoadingBar isLoading={isLoading} progress={progress} /> */}
@@ -59,7 +70,16 @@ function Home() {
             position: [-18.8, 12.06, 9.58],
           }}
         >
-          <ambientLight intensity={0.5} />
+          <Perf position="top-left" />
+          <Environment
+            preset="sunset"
+            ground={{
+              height: envMapHeight,
+              radius: envMapRadius,
+              scale: envMapScale,
+            }}
+          ></Environment>
+          {/*   <ambientLight intensity={0.5} /> */}
           {/*  <directionalLight
             position={dLightPosition}
             intensity={dLightIntensity}
@@ -80,11 +100,11 @@ function Home() {
               isWaterMovingUp={isWaterMovingUp}
             />
           </Suspense>
-          {/*  <Sky
-             distance={450000}
+          {/* <Sky
+            distance={450000}
             sunPosition={[0, 1, 0]}
             inclination={0}
-            azimuth={0.25} 
+            azimuth={0.25}
           /> */}
         </Canvas>
 
