@@ -20,7 +20,6 @@ function Home() {
   const [isReset, setIsReset] = useState(false);
 
   const toggleWaterMovingUp = () => {
-    setIsReset(false);
     setIsWaterMovingUp((prev) => !prev);
   };
 
@@ -126,6 +125,7 @@ function Home() {
           isWaterMoving={isWaterMoving}
           isScenarioChanged={isScenarioChanged}
           handleReset={handleReset}
+          isReset={isReset}
         />
       </div>
       {/* )} */}

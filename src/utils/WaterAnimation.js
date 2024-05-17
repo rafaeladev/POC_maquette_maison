@@ -3,7 +3,7 @@ import { LoopOnce } from "three";
 // Fonction pour démarrer l'animation de l'eau
 export const startAnimation = (name, animationClip, reverse = false) => {
   const action = animationClip.actions[name];
-  console.log("animation lancee");
+
   if (action) {
     action.clampWhenFinished = true;
     action.setLoop(LoopOnce, 1);
