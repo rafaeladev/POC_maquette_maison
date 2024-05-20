@@ -1,26 +1,29 @@
-import { LoopOnce } from "three";
+import { LoopOnce } from 'three';
 
 // Fonction pour démarrer l'animation de l'eau
 export const startAnimation = (name, animationClip, reverse = false) => {
-  const action = animationClip.actions[name];
+    const action = animationClip.actions[name];
 
-  if (action) {
-    action.clampWhenFinished = true;
-    action.setLoop(LoopOnce, 1);
+    console.log('Starting animation:', name, 'Reverse:', reverse, 'Action:', action);
 
-    // Définir la vitesse de l'animation à -1 pour la jouer en sens inverse
-    action.timeScale = reverse ? -1 : 1;
+    if (action) {
+        action.clampWhenFinished = true;
+        action.setLoop(LoopOnce, 1);
+        action.timeScale = reverse ? -1 : 1; // Vitesse de l'animation
 
-    // Jouer l'animation à partir de la fin si elle est en sens inverse
-    if (reverse) {
-      action.paused = false; // Assurer que l'animation n'est pas en pause
-      action.play();
-      action.crossFadeTo(action, 0); // Commencer immédiatement l'animation
-      action.time = action.getClip().duration; // Débuter à la fin de l'animation
+        if (reverse) {
+            action.paused = false;
+            action.time = action.getClip().duration; // Commence à la fin si en sens inverse
+            action.play();
+
+            action.crossFadeTo(action, 0);
+        } else {
+            action.reset();
+            action.paused = false;
+            action.timeScale = 1;
+            action.play();
+        }
     } else {
-      action.play();
+        console.log('Action not found:', name); // Pour déboguer si une action n'est pas trouvée
     }
-  } else {
-    console.log("Action not found:", name); // Pour déboguer si une action n'est pas trouvée
-  }
 };

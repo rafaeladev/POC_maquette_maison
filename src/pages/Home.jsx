@@ -39,11 +39,11 @@ function Home() {
         setIsWaterMovingUp(false);
     };
 
-    /*  const { dLightPosition, dLightIntensity } = useControls("Directional Light", {
-    dLightPosition: { value: [0, 10, 0], step: 0.1 },
-    dLightIntensity: { value: 1, step: 0.1 },
-  });
- */
+    const { dLightPosition, dLightIntensity } = useControls('Directional Light', {
+        dLightPosition: { value: [0, 10, 0], step: 0.1 },
+        dLightIntensity: { value: 1, step: 0.1 },
+    });
+
     /* const { sLightPosition, sLightAngle, sLightPenumbra } = useControls(
     "Spot Light",
     {
@@ -75,7 +75,7 @@ function Home() {
             {/* {!isLoading && ( */}
             <div className='webgl'>
                 <Canvas
-                    shadows
+                    shadows={true}
                     flat
                     camera={{
                         fov: 45,
@@ -92,13 +92,13 @@ function Home() {
                             radius: envMapRadius,
                             scale: envMapScale,
                         }}
-                    ></Environment> */}
+                    /> */}
                     {/*   <ambientLight intensity={0.5} /> */}
-                    {/*  <directionalLight
-            position={dLightPosition}
-            intensity={dLightIntensity}
-            castShadow
-          /> */}
+                    {/* <directionalLight
+                        position={dLightPosition}
+                        intensity={dLightIntensity}
+                        castShadow
+                    /> */}
                     {/*   <spotLight
             position={sLightPosition}
             angle={sLightAngle}
