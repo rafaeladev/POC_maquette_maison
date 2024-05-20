@@ -8,9 +8,8 @@ import {
     shaderMaterial,
     Text,
     Center,
+    Stage,
 } from '@react-three/drei';
-
-import { LoopOnce, Mesh } from 'three';
 
 import { useFrame, useLoader, useThree, extend } from '@react-three/fiber';
 
@@ -62,6 +61,32 @@ function Scene(props) {
         position: { value: [-5.53, -2.27, 0], step: 0.01 },
         rotation: { value: [4.71, 0, 4.7], step: 0.01 },
     });
+
+    const { shadowType, shadowOpacity, shadowBlur, environmentType, preset, stageIntensity } =
+        useControls('Stage', {
+            shadowType: { options: ['contact', 'accumulative'], value: 'contact' },
+            shadowOpacity: { value: 0.2, min: 0, max: 1, step: 0.01 },
+            shadowBlur: { value: 3, min: 0, max: 10, step: 1 },
+            environmentType: {
+                options: [
+                    'sunset',
+                    'dawn',
+                    'night',
+                    'warehouse',
+                    'city',
+                    'park',
+                    'forest',
+                    'lobby',
+                    'studio',
+                ],
+                value: 'sunset',
+            },
+            preset: {
+                options: ['portrait', 'rembrandt', 'upfront', 'soft'],
+                value: 'portrait',
+            },
+            stageIntensity: { value: 0.5, min: 0, max: 1, step: 0.01 },
+        });
 
     // States
     const [isMoving, setIsMoving] = useState(false);
@@ -172,12 +197,6 @@ function Scene(props) {
 
     return (
         <>
-            {/* Environnement */}
-            <Environment
-                path='/envMap/'
-                files='potsdamer_platz_256.hdr'
-            />
-
             <color
                 args={['#241B27']}
                 attach='background'
@@ -185,104 +204,112 @@ function Scene(props) {
 
             <OrbitControls makeDefault />
 
-            {/* Lumière directionnelle */}
-            <directionalLight
-                castShadow
-                position={[1, 2, 3]}
-                intensity={0.2}
-                shadow-normalBias={0.04}
-            />
+            <Stage
+                shadows={{ type: shadowType, opacity: shadowOpacity, blur: shadowBlur }}
+                environment={environmentType}
+                preset={preset}
+                intensity={stageIntensity}
+            >
+                {/* Affichage du modèle */}
+                {Object.keys(nodes).map((key) => {
+                    if (key === 'Scene') {
+                        console.log('Scene');
+                        return null;
+                    }
+                    if (
+                        key === 'eau_exterieur' ||
+                        key === 'eau_piscine' ||
+                        key === 'eau_interieur'
+                    ) {
+                        // nodes[key].material.transparent = true;
+                        // nodes[key].material.opacity = 0.8;
+                        return (
+                            // Approche  n°2 avec Water from three-stdlib
+                            // <mesh
+                            //     key={key}
+                            //     ref={
+                            //         key === 'Eau_exterieur'
+                            //             ? eauExterieur
+                            //             : key === 'Eau_interieur'
+                            //             ? eauInterieur
+                            //             : eauPiscine
+                            //     }
+                            // >
+                            //     <Ocean
+                            //         key={key}
+                            //         nodes={nodes[key]}
+                            //         isMoving={isMoving}
+                            //         setIsMoving={setIsMoving}
+                            //     />
+                            // </mesh>
 
-            {/* Lumière ambiante */}
-            <ambientLight intensity={0.1} />
+                            // Shader material n°1
+                            <primitive
+                                key={key}
+                                object={nodes[key]}
+                                ref={
+                                    key === 'eau_exterieur'
+                                        ? eauExterieur
+                                        : key === 'eau_interieur'
+                                        ? eauInterieur
+                                        : eauPiscine
+                                }
+                                castShadow
+                                receiveShadow
+                            >
+                                <shaderMaterial
+                                    attach='material'
+                                    args={[data]}
+                                />
+                            </primitive>
 
-            {/* Affichage du modèle */}
-            {Object.keys(nodes).map((key) => {
-                if (key === 'eau_exterieur' || key === 'eau_piscine' || key === 'eau_interieur') {
-                    // nodes[key].material.transparent = true;
-                    // nodes[key].material.opacity = 0.8;
+                            // <primitive key={key} object={nodes[key]} />
+                        );
+                    } else if (key === 'Scene') {
+                        return null;
+                    }
                     return (
-                        // Approche  n°2 avec Water from three-stdlib
-                        // <mesh
-                        //     key={key}
-                        //     ref={
-                        //         key === 'Eau_exterieur'
-                        //             ? eauExterieur
-                        //             : key === 'Eau_interieur'
-                        //             ? eauInterieur
-                        //             : eauPiscine
-                        //     }
-                        // >
-                        //     <Ocean
-                        //         key={key}
-                        //         nodes={nodes[key]}
-                        //         isMoving={isMoving}
-                        //         setIsMoving={setIsMoving}
-                        //     />
-                        // </mesh>
-
-                        // Shader material n°1
                         <primitive
                             key={key}
                             object={nodes[key]}
-                            ref={
-                                key === 'eau_exterieur'
-                                    ? eauExterieur
-                                    : key === 'eau_interieur'
-                                    ? eauInterieur
-                                    : eauPiscine
-                            }
-                        >
-                            <shaderMaterial
-                                attach='material'
-                                args={[data]}
-                            />
-                        </primitive>
-
-                        // <primitive key={key} object={nodes[key]} />
+                            castShadow
+                            receiveShadow
+                        />
                     );
-                } else if (key === 'Scene') {
-                    return null;
-                }
-                return (
-                    <primitive
-                        key={key}
-                        object={nodes[key]}
-                    />
-                );
-            })}
+                })}
 
-            <Text
-                font='./fonts/OpenSans-Regular.woff'
-                fontSize={0.2}
-                position={position}
-                rotation={rotation}
-                maxWidth={1.6}
-                color='white'
-                textAlign='center'
-            >
-                Click to start water animation
-            </Text>
+                <Text
+                    font='./fonts/OpenSans-Regular.woff'
+                    fontSize={0.2}
+                    position={position}
+                    rotation={rotation}
+                    maxWidth={1.6}
+                    color='white'
+                    textAlign='center'
+                >
+                    Click to start water animation
+                </Text>
 
-            {/*  Cube */}
-            <mesh
-                ref={buttonCube}
-                position-x={-5.5}
-                position-y={-2.55}
-                scale={1}
-                onClick={restart}
-                onPointerDown={handlePress} // Appelé lorsque le bouton est pressé
-                onPointerUp={handleRelease} // Appelé lorsque le bouton est relâché
-                onPointerEnter={() => {
-                    document.body.style.cursor = 'pointer';
-                }}
-                onPointerLeave={() => {
-                    document.body.style.cursor = 'default';
-                }}
-            >
-                <boxGeometry args={[1, 0.5, 2]} />
-                <meshStandardMaterial color='purple' />
-            </mesh>
+                {/*  Cube */}
+                <mesh
+                    ref={buttonCube}
+                    position-x={-5.5}
+                    position-y={-2.55}
+                    scale={1}
+                    onClick={restart}
+                    onPointerDown={handlePress} // Appelé lorsque le bouton est pressé
+                    onPointerUp={handleRelease} // Appelé lorsque le bouton est relâché
+                    onPointerEnter={() => {
+                        document.body.style.cursor = 'pointer';
+                    }}
+                    onPointerLeave={() => {
+                        document.body.style.cursor = 'default';
+                    }}
+                >
+                    <boxGeometry args={[1, 0.5, 2]} />
+                    <meshStandardMaterial color='purple' />
+                </mesh>
+            </Stage>
         </>
     );
 }

@@ -85,14 +85,14 @@ function Home() {
                     }}
                 >
                     <Perf position='top-left' />
-                    <Environment
+                    {/* <Environment
                         preset='sunset'
                         ground={{
                             height: envMapHeight,
                             radius: envMapRadius,
                             scale: envMapScale,
                         }}
-                    ></Environment>
+                    ></Environment> */}
                     {/*   <ambientLight intensity={0.5} /> */}
                     {/*  <directionalLight
             position={dLightPosition}
