@@ -6,6 +6,8 @@ import {
     Environment,
     useAnimations,
     shaderMaterial,
+    Text,
+    Center,
 } from '@react-three/drei';
 
 import { LoopOnce, Mesh } from 'three';
@@ -18,14 +20,16 @@ import waterFragmentShader from './shaders/water/fragment.glsl';
 
 import { useControls } from 'leva';
 
+import { startAnimation } from './utils/WaterAnimation.js';
+
 // Approche  n°2 avec Water from three-stdlib
 import Ocean from './Ocean.jsx';
 
-function Scene() {
+function Scene(props) {
     // Debug controls
     const { depthColor, surfaceColor } = useControls({
-        depthColor: '#82c9ef',
-        surfaceColor: '#ffffff',
+        depthColor: '#5e98ba',
+        surfaceColor: '#c1def5',
     });
 
     // Approche n°1 avec shaderMaterial
@@ -41,17 +45,22 @@ function Scene() {
         uColorOffset,
         uColorMultiplier,
     } = useControls({
-        uBigWavesElevation: { value: 0.04, min: 0, max: 1, step: 0.001 },
-        uBigWavesFrequencyX: { value: 2.6, min: 0, max: 10, step: 0.001 },
-        uBigWavesFrequencyY: { value: 2, min: 0, max: 10, step: 0.001 },
-        uBigWavesSpeed: { value: 0.82, min: 0, max: 4, step: 0.001 },
+        uBigWavesElevation: { value: 0.02, min: 0, max: 1, step: 0.001 },
+        uBigWavesFrequencyX: { value: 2.5, min: 0, max: 10, step: 0.001 },
+        uBigWavesFrequencyY: { value: 2.5, min: 0, max: 10, step: 0.001 },
+        uBigWavesSpeed: { value: 1.72, min: 0, max: 4, step: 0.001 },
 
-        uSmallWavesElevation: { value: 0.19, min: 0, max: 1, step: 0.001 },
-        uSmallWavesFrequency: { value: 11, min: 0, max: 30, step: 0.001 },
-        uSmallWavesSpeed: { value: 0.2, min: 0, max: 4, step: 0.001 },
-        uSmallIterations: { value: 4, min: 0, max: 5, step: 1 },
+        uSmallWavesElevation: { value: 0.07, min: 0, max: 1, step: 0.001 },
+        uSmallWavesFrequency: { value: 2.43, min: 0, max: 30, step: 0.001 },
+        uSmallWavesSpeed: { value: 0.97, min: 0, max: 4, step: 0.001 },
+        uSmallIterations: { value: 1, min: 0, max: 5, step: 1 },
         uColorOffset: { value: 0.08, min: 0, max: 1, step: 0.001 },
         uColorMultiplier: { value: 5, min: 0, max: 10, step: 0.001 },
+    });
+
+    const { position, rotation } = useControls('Text', {
+        position: { value: [-5.53, -2.27, 0], step: 0.01 },
+        rotation: { value: [4.71, 0, 4.7], step: 0.01 },
     });
 
     // States
@@ -60,7 +69,7 @@ function Scene() {
 
     // Model
     // const scene = useGLTF('./model/POC_Maquette_v2.glb');
-    const { nodes, animations } = useGLTF('./model/POC_Maquette_surfaceEau.glb');
+    const { nodes, animations } = useGLTF('./model/Maquette_v1.glb');
 
     // Ref
     const eauPiscine = useRef();
@@ -110,56 +119,38 @@ function Scene() {
     );
 
     // Animation de l'eau
-    /* useFrame(({ clock }) => {
-    eauExterieur.current.material.uniforms.uTime.value = clock.getElapsedTime();
-    eauInterieur.current.material.uniforms.uTime.value = clock.getElapsedTime();
-    eauPiscine.current.material.uniforms.uTime.value = clock.getElapsedTime();
-  }); */
+    useFrame(({ clock }) => {
+        eauExterieur.current.material.uniforms.uTime.value = clock.getElapsedTime();
+        eauInterieur.current.material.uniforms.uTime.value = clock.getElapsedTime();
+        eauPiscine.current.material.uniforms.uTime.value = clock.getElapsedTime();
+    });
 
     // Animations
-    const animationClip = useAnimations(animations, nodes.Eau_exterieur);
+    const animationClip = useAnimations(animations, nodes.eau_exterieur);
     const animationsClips = [
-        useAnimations(animations, nodes.Eau_exterieur),
-        useAnimations(animations, nodes.Eau_piscine),
-        useAnimations(animations, nodes.Eau_interieur),
+        useAnimations(animations, nodes.eau_exterieur),
+        useAnimations(animations, nodes.eau_piscine),
+        useAnimations(animations, nodes.eau_interieur),
     ];
-
-    // Fonction pour démarrer l'animation de l'eau
-    const startAnimation = (name) => {
-        console.log('Animation:', name);
-        const action = animationClip.actions[name];
-        const action2 = animationsClips[2].actions['eauInterieur0to80'];
-        const action3 = animationsClips[1].actions['eauPiscine0To80'];
-
-        console.log(action, action2, action3);
-
-        if (action) {
-            action.clampWhenFinished = true;
-            action.setLoop(LoopOnce, 1);
-            action2.setLoop(LoopOnce, 1);
-            action3.setLoop(LoopOnce, 1);
-            action2.clampWhenFinished = true;
-            action3.clampWhenFinished = true;
-            action.play();
-            action2.play();
-            action3.play();
-        } else {
-            console.log('Action not found:', name); // Pour déboguer si une action n'est pas trouvée
-        }
-    };
 
     // Animation de l'eau
     useEffect(() => {
-        if (isMoving) {
-            startAnimation('eauExterieur0To80');
-            // startAnimation('eauInterieur0To80');
-            // startAnimation('eauPiscine0To80');
-        } else {
-            // actions['eauExterieur0To80'].stop();
-            // actions['eauInterieur0To80'].stop();
-            // actions['eauPiscine0To80'].stop();
+        if (props.isWaterMoving && props.isWaterMovingUp) {
+            startAnimation('eauExterieur0To80', animationsClips[0]);
+            startAnimation('eauPiscine0To80', animationsClips[1]);
+            startAnimation('eauInterieur0to80', animationsClips[2]);
+            window.setTimeout(() => {
+                props.toggleAnimation(false);
+            }, 5000);
+        } else if (props.isWaterMoving && !props.isWaterMovingUp) {
+            startAnimation('eauExterieur0To80', animationsClips[0], true);
+            startAnimation('eauPiscine0To80', animationsClips[1], true);
+            startAnimation('eauInterieur0to80', animationsClips[2], true);
+            window.setTimeout(() => {
+                props.toggleAnimation(false);
+            }, 5000);
         }
-    }, [isMoving]);
+    }, [props.isWaterMoving]);
 
     // Fonction pour gérer le clic sur le bouton
     const handlePress = () => {
@@ -171,7 +162,12 @@ function Scene() {
     };
 
     const restart = () => {
-        setIsMoving(true);
+        if (props.isWaterMovingUp) {
+            props.toggleWaterMovingUp(false);
+        } else {
+            props.toggleWaterMovingUp(true);
+        }
+        props.toggleAnimation(true);
     };
 
     return (
@@ -202,43 +198,46 @@ function Scene() {
 
             {/* Affichage du modèle */}
             {Object.keys(nodes).map((key) => {
-                if (key === 'Eau_exterieur' || key === 'Eau_piscine' || key === 'Eau_interieur') {
+                if (key === 'eau_exterieur' || key === 'eau_piscine' || key === 'eau_interieur') {
                     // nodes[key].material.transparent = true;
                     // nodes[key].material.opacity = 0.8;
                     return (
                         // Approche  n°2 avec Water from three-stdlib
-                        <mesh
+                        // <mesh
+                        //     key={key}
+                        //     ref={
+                        //         key === 'Eau_exterieur'
+                        //             ? eauExterieur
+                        //             : key === 'Eau_interieur'
+                        //             ? eauInterieur
+                        //             : eauPiscine
+                        //     }
+                        // >
+                        //     <Ocean
+                        //         key={key}
+                        //         nodes={nodes[key]}
+                        //         isMoving={isMoving}
+                        //         setIsMoving={setIsMoving}
+                        //     />
+                        // </mesh>
+
+                        // Shader material n°1
+                        <primitive
                             key={key}
+                            object={nodes[key]}
                             ref={
-                                key === 'Eau_exterieur'
+                                key === 'eau_exterieur'
                                     ? eauExterieur
-                                    : key === 'Eau_interieur'
+                                    : key === 'eau_interieur'
                                     ? eauInterieur
                                     : eauPiscine
                             }
                         >
-                            <Ocean
-                                key={key}
-                                nodes={nodes[key]}
-                                isMoving={isMoving}
-                                setIsMoving={setIsMoving}
+                            <shaderMaterial
+                                attach='material'
+                                args={[data]}
                             />
-                        </mesh>
-
-                        // Shader material n°1
-                        /*  <primitive
-              key={key}
-              object={nodes[key]}
-              ref={
-                key === "Eau_exterieur"
-                  ? eauExterieur
-                  : key === "Eau_interieur"
-                  ? eauInterieur
-                  : eauPiscine
-              }
-            >
-              <shaderMaterial attach="material" args={[data]} />
-            </primitive> */
+                        </primitive>
 
                         // <primitive key={key} object={nodes[key]} />
                     );
@@ -253,11 +252,23 @@ function Scene() {
                 );
             })}
 
+            <Text
+                font='./fonts/OpenSans-Regular.woff'
+                fontSize={0.2}
+                position={position}
+                rotation={rotation}
+                maxWidth={1.6}
+                color='white'
+                textAlign='center'
+            >
+                Click to start water animation
+            </Text>
+
             {/*  Cube */}
             <mesh
                 ref={buttonCube}
-                position-x={-5}
-                position-y={-1.55}
+                position-x={-5.5}
+                position-y={-2.55}
                 scale={1}
                 onClick={restart}
                 onPointerDown={handlePress} // Appelé lorsque le bouton est pressé
