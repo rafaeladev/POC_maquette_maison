@@ -13,6 +13,7 @@ import { Perf } from "r3f-perf";
 
 import { useControls } from "leva";
 import Scene from "../Scene.jsx";
+import FadeLoaderComponent from "../components/FadeLoader.jsx";
 
 function Home() {
   const [isScenarioChanged, setIsScenarioChanged] = useState(false);
@@ -68,19 +69,21 @@ function Home() {
       <Leva hidden={false} collapsed={true} />
 
       {/* {!isLoading && ( */}
-      <div className="webgl">
-        <Canvas
-          shadows={true}
-          flat
-          camera={{
-            fov: 45,
-            near: 0.1,
-            far: 200,
-            position: [-18.8, 12.06, 9.58],
-          }}
-        >
-          <Perf position="top-left" />
-          {/* <Environment
+
+      <Suspense fallback={<FadeLoaderComponent />}>
+        <div className="webgl">
+          <Canvas
+            shadows={true}
+            flat
+            camera={{
+              fov: 45,
+              near: 0.1,
+              far: 200,
+              position: [-18.8, 12.06, 9.58],
+            }}
+          >
+            <Perf position="top-left" />
+            {/* <Environment
                         preset='sunset'
                         ground={{
                             height: envMapHeight,
@@ -88,19 +91,19 @@ function Home() {
                             scale: envMapScale,
                         }}
                     /> */}
-          {/*  <ambientLight intensity={0.1} />
+            {/*  <ambientLight intensity={0.1} />
           <directionalLight
             position={dLightPosition}
             intensity={dLightIntensity}
             castShadow
           /> */}
-          {/*   <spotLight
+            {/*   <spotLight
             position={sLightPosition}
             angle={sLightAngle}
             penumbra={sLightPenumbra}
             castShadow
           /> */}
-          {/*     <Suspense fallback={null}>
+            {/*     <Suspense fallback={null}>
             <Cuisine
               isScenarioChanged={isScenarioChanged}
               toggleScenario={toggleScenario}
@@ -111,13 +114,13 @@ function Home() {
               isReset={isReset}
             />
           </Suspense> */}
-          {/* <Sky
+            {/* <Sky
             distance={450000}
             sunPosition={[0, 1, 0]}
             inclination={0}
             azimuth={0.25}
           /> */}
-          <Suspense fallback={null}>
+
             <Scene
               isScenarioChanged={isScenarioChanged}
               toggleScenario={toggleScenario}
@@ -128,10 +131,11 @@ function Home() {
               toggleReset={handleReset}
               isReset={isReset}
             />
-          </Suspense>
-        </Canvas>
+          </Canvas>
+        </div>
+      </Suspense>
 
-        {/*   <Interface
+      {/*   <Interface
           toggleWaterMovingUp={toggleWaterMovingUp}
           toggleWaterMoving={toggleWaterMoving}
           isWaterMovingUp={isWaterMovingUp}
@@ -140,7 +144,7 @@ function Home() {
           handleReset={handleReset}
           isReset={isReset}
         /> */}
-      </div>
+
       {/* )} */}
     </>
   );

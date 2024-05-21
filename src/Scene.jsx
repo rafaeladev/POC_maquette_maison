@@ -6,15 +6,11 @@ import React, { useRef, useEffect, useState, useMemo } from "react";
 
 // imports drei
 import {
-  useGLTF,
   OrbitControls,
   Environment,
   useAnimations,
-  shaderMaterial,
   Text,
-  Center,
   Stage,
-  ContactShadows,
 } from "@react-three/drei";
 
 // imports React Three Fiber

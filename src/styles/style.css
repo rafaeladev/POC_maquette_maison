@@ -120,3 +120,17 @@ button:hover {
 .point.visible .label {
     transform: scale(1, 1);
 }
+
+.loading-spinner {
+    text-align: center;
+    padding: 20px;
+    width: 100%;
+    height: 100vh;
+    margin: auto;
+    display: flex;
+    flex-direction: column;
+    gap:2rem;
+    color:white;
+    justify-content: center;
+    align-items: center;
+}
