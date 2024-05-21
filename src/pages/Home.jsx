@@ -66,7 +66,7 @@ function Home() {
     <>
       {/* <LoadingBar isLoading={isLoading} progress={progress} /> */}
 
-      <Leva hidden={true} collapsed={true} />
+      <Leva hidden={false} collapsed={true} />
 
       {/* {!isLoading && ( */}
 
@@ -82,7 +82,7 @@ function Home() {
               position: [-18.8, 12.06, 9.58],
             }}
           >
-            {/*   <Perf position="top-left"  /> */}
+            <Perf position="top-left" />
             {/* <Environment
                         preset='sunset'
                         ground={{

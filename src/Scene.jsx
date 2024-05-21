@@ -36,38 +36,38 @@ import Ocean from "./Ocean.jsx";
 
 function Scene(props) {
   // ---  Debug controls --- //
-  const { depthColor, surfaceColor } = useControls({
-    depthColor: "#5e98ba",
-    surfaceColor: "#c1def5",
-  });
 
   // Approche n°1 avec shaderMaterial
+  const { Elevation, FrequencyX, FrequencyY, Speed } = useControls(
+    "Big Waves",
+    {
+      Elevation: { value: 0.02, min: 0, max: 1, step: 0.001 },
+      FrequencyX: { value: 2.5, min: 0, max: 10, step: 0.001 },
+      FrequencyY: { value: 2.5, min: 0, max: 10, step: 0.001 },
+      Speed: { value: 1.72, min: 0, max: 4, step: 0.001 },
+    }
+  );
+
   const {
-    uBigWavesElevation,
-    uBigWavesFrequencyX,
-    uBigWavesFrequencyY,
-    uBigWavesSpeed,
     uSmallWavesElevation,
     uSmallWavesFrequency,
     uSmallWavesSpeed,
     uSmallIterations,
-    uColorOffset,
-    uColorMultiplier,
-    uOpacity,
-  } = useControls({
-    uBigWavesElevation: { value: 0.02, min: 0, max: 1, step: 0.001 },
-    uBigWavesFrequencyX: { value: 2.5, min: 0, max: 10, step: 0.001 },
-    uBigWavesFrequencyY: { value: 2.5, min: 0, max: 10, step: 0.001 },
-    uBigWavesSpeed: { value: 1.72, min: 0, max: 4, step: 0.001 },
-
+  } = useControls("Small Waves", {
     uSmallWavesElevation: { value: 0.07, min: 0, max: 1, step: 0.001 },
     uSmallWavesFrequency: { value: 2.43, min: 0, max: 30, step: 0.001 },
     uSmallWavesSpeed: { value: 0.97, min: 0, max: 4, step: 0.001 },
     uSmallIterations: { value: 1, min: 0, max: 5, step: 1 },
-    uColorOffset: { value: 0.08, min: 0, max: 1, step: 0.001 },
-    uColorMultiplier: { value: 5, min: 0, max: 10, step: 0.001 },
-    uOpacity: { value: 0.2, min: 0, max: 1, step: 0.01 },
   });
+
+  const { depthColor, surfaceColor, uColorOffset, uColorMultiplier, uOpacity } =
+    useControls("Waves colors", {
+      depthColor: "#5e98ba",
+      surfaceColor: "#c1def5",
+      uColorOffset: { value: 0.08, min: 0, max: 1, step: 0.001 },
+      uColorMultiplier: { value: 5, min: 0, max: 10, step: 0.001 },
+      uOpacity: { value: 0.2, min: 0, max: 1, step: 0.01 },
+    });
 
   const { position, rotation } = useControls("Text", {
     position: { value: [-5.53, -2.27, 0], step: 0.01 },
@@ -136,11 +136,11 @@ function Scene(props) {
     () => ({
       uniforms: {
         uTime: { value: 0 },
-        uBigWavesElevation: { value: uBigWavesElevation },
+        uBigWavesElevation: { value: Elevation },
         uBigWavesFrequency: {
-          value: new THREE.Vector2(uBigWavesFrequencyX, uBigWavesFrequencyY),
+          value: new THREE.Vector2(FrequencyX, FrequencyY),
         },
-        uBigWavesSpeed: { value: uBigWavesSpeed },
+        uBigWavesSpeed: { value: Speed },
         uSmallWavesElevation: { value: uSmallWavesElevation },
         uSmallWavesFrequency: { value: uSmallWavesFrequency },
         uSmallWavesSpeed: { value: uSmallWavesSpeed },
@@ -154,10 +154,10 @@ function Scene(props) {
       vertexShader,
     }),
     [
-      uBigWavesElevation,
-      uBigWavesFrequencyX,
-      uBigWavesFrequencyY,
-      uBigWavesSpeed,
+      Elevation,
+      FrequencyX,
+      FrequencyY,
+      Speed,
       uSmallWavesElevation,
       uSmallWavesFrequency,
       uSmallWavesSpeed,
@@ -171,11 +171,11 @@ function Scene(props) {
     () => ({
       uniforms: {
         uTime: { value: 0 },
-        uBigWavesElevation: { value: uBigWavesElevation },
+        uBigWavesElevation: { value: Elevation },
         uBigWavesFrequency: {
-          value: new THREE.Vector2(uBigWavesFrequencyX, uBigWavesFrequencyY),
+          value: new THREE.Vector2(FrequencyX, FrequencyY),
         },
-        uBigWavesSpeed: { value: uBigWavesSpeed },
+        uBigWavesSpeed: { value: Speed },
         uSmallWavesElevation: { value: uSmallWavesElevation },
         uSmallWavesFrequency: { value: uSmallWavesFrequency },
         uSmallWavesSpeed: { value: uSmallWavesSpeed },
@@ -190,10 +190,10 @@ function Scene(props) {
       vertexShader,
     }),
     [
-      uBigWavesElevation,
-      uBigWavesFrequencyX,
-      uBigWavesFrequencyY,
-      uBigWavesSpeed,
+      Elevation,
+      FrequencyX,
+      FrequencyY,
+      Speed,
       uSmallWavesElevation,
       uSmallWavesFrequency,
       uSmallWavesSpeed,
