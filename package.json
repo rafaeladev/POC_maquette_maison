@@ -22,6 +22,7 @@
     "r3f-perf": "^7.2.1",
     "react": "18.2",
     "react-dom": "18.2",
+    "rollup-plugin-visualizer": "^5.12.0",
     "three": "^0.153.0",
     "three-stdlib": "^2.30.0",
     "vercel": "^32.1.0",

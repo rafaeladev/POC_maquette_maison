@@ -117,16 +117,18 @@ function Home() {
             inclination={0}
             azimuth={0.25}
           /> */}
-          <Scene
-            isScenarioChanged={isScenarioChanged}
-            toggleScenario={toggleScenario}
-            toggleAnimation={toggleWaterMoving}
-            toggleWaterMovingUp={toggleWaterMovingUp}
-            isWaterMoving={isWaterMoving}
-            isWaterMovingUp={isWaterMovingUp}
-            toggleReset={handleReset}
-            isReset={isReset}
-          />
+          <Suspense fallback={null}>
+            <Scene
+              isScenarioChanged={isScenarioChanged}
+              toggleScenario={toggleScenario}
+              toggleAnimation={toggleWaterMoving}
+              toggleWaterMovingUp={toggleWaterMovingUp}
+              isWaterMoving={isWaterMoving}
+              isWaterMovingUp={isWaterMovingUp}
+              toggleReset={handleReset}
+              isReset={isReset}
+            />
+          </Suspense>
         </Canvas>
 
         {/*   <Interface

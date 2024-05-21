@@ -1,5 +1,10 @@
+// Code source du composant Scene
+// Ce composant est responsable de l'affichage de la scène 3D
+
+// imports React
 import React, { useRef, useEffect, useState, useMemo } from "react";
 
+// imports drei
 import {
   useGLTF,
   OrbitControls,
@@ -12,23 +17,29 @@ import {
   ContactShadows,
 } from "@react-three/drei";
 
-import { useFrame, useLoader, useThree, extend } from "@react-three/fiber";
+// imports React Three Fiber
+import { useFrame, useLoader } from "@react-three/fiber";
 
+// imports Three.js
 import * as THREE from "three";
+import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
+
+// imports des shaders
 import waterVertexShader from "./shaders/water/vertex.glsl";
 import waterFragmentShader from "./shaders/water/fragment.glsl";
-
 import waterFragmentShaderSide from "./shaders/waterSide/fragment.glsl";
 
+// imports des composants
 import { useControls } from "leva";
 
+// imports des animations
 import { startAnimation } from "./utils/WaterAnimation.js";
 
 // Approche  n°2 avec Water from three-stdlib
 import Ocean from "./Ocean.jsx";
 
 function Scene(props) {
-  // Debug controls
+  // ---  Debug controls --- //
   const { depthColor, surfaceColor } = useControls({
     depthColor: "#5e98ba",
     surfaceColor: "#c1def5",
@@ -46,6 +57,7 @@ function Scene(props) {
     uSmallIterations,
     uColorOffset,
     uColorMultiplier,
+    uOpacity,
   } = useControls({
     uBigWavesElevation: { value: 0.02, min: 0, max: 1, step: 0.001 },
     uBigWavesFrequencyX: { value: 2.5, min: 0, max: 10, step: 0.001 },
@@ -58,6 +70,7 @@ function Scene(props) {
     uSmallIterations: { value: 1, min: 0, max: 5, step: 1 },
     uColorOffset: { value: 0.08, min: 0, max: 1, step: 0.001 },
     uColorMultiplier: { value: 5, min: 0, max: 10, step: 0.001 },
+    uOpacity: { value: 0.2, min: 0, max: 1, step: 0.01 },
   });
 
   const { position, rotation } = useControls("Text", {
@@ -99,13 +112,13 @@ function Scene(props) {
     presetValues: { value: [1, 1, 1], step: 0.1 },
   });
 
-  // States
-  const [isMoving, setIsMoving] = useState(false);
-  /*   const [isLoaded, setIsLoaded] = useState(false); */
+  // ---  Debug controls --- //
 
-  // Model
-  // const scene = useGLTF('./model/POC_Maquette_v2.glb');
-  const { nodes, animations } = useGLTF("./model/Maquette_v1.glb");
+  // --- Model --- //
+  const { nodes, animations } = useLoader(
+    GLTFLoader,
+    "./model/Maquette_v1.glb"
+  );
 
   // Ref
   const eauPiscine = useRef();
@@ -116,10 +129,11 @@ function Scene(props) {
   const eauExterieurCote = useRef();
   const buttonCube = useRef();
 
-  // Shader material
+  // --- Model --- //
+
+  // --- Shader material --- //
   const fragmentShader = waterFragmentShader;
   const vertexShader = waterVertexShader;
-
   const fragmentShaderSide = waterFragmentShaderSide;
 
   const data = useMemo(
@@ -174,6 +188,7 @@ function Scene(props) {
         uSurfaceColor: { value: new THREE.Color(surfaceColor) },
         uColorOffset: { value: uColorOffset },
         uColorMultiplier: { value: uColorMultiplier },
+        uOpacity: { value: 0.8 },
       },
       fragmentShader: fragmentShaderSide,
       vertexShader,
@@ -189,10 +204,13 @@ function Scene(props) {
       uSmallIterations,
       depthColor,
       surfaceColor,
+      uOpacity,
     ]
   );
+  // --- Shader material --- //
 
-  // Animation de l'eau
+  // --- Animation de l'eau --- //
+  // Animation du shader material
   useFrame(({ clock }) => {
     if (
       eauExterieur.current &&
@@ -214,13 +232,11 @@ function Scene(props) {
       eauPiscineCote.current.material.uniforms.uTime.value =
         clock.getElapsedTime();
     }
-    // console.log(eauExterieur.current);
   });
 
-  // Animations
+  // Animations montée de l'eau
   const [showCoteMeshes, setShowCoteMeshes] = useState(false);
 
-  const animationClip = useAnimations(animations, nodes.eau_exterieur);
   const animationsClips = [
     useAnimations(animations, nodes.eau_exterieur),
     useAnimations(animations, nodes.eau_piscine),
@@ -232,33 +248,49 @@ function Scene(props) {
 
   // Animation de l'eau
   useEffect(() => {
-    if (props.isWaterMoving && props.isWaterMovingUp) {
-      setShowCoteMeshes(true);
-      startAnimation("eauExterieur0To80", animationsClips[0]);
-      startAnimation("eauPiscine0To80", animationsClips[1]);
-      startAnimation("eauInterieur0to80", animationsClips[2]);
-      startAnimation("eauInterieurCote0to80", animationsClips[3]);
-      startAnimation("eauPiscineCote0To80", animationsClips[4]);
-      startAnimation("eauExterieurCote0To80", animationsClips[5]);
-      window.setTimeout(() => {
-        props.toggleAnimation(false);
-        props.toggleScenario(true);
-      }, 5000);
-    } else if (props.isWaterMoving && !props.isWaterMovingUp) {
-      setShowCoteMeshes(true);
-      startAnimation("eauExterieur0To80", animationsClips[0], true);
-      startAnimation("eauPiscine0To80", animationsClips[1], true);
-      startAnimation("eauInterieur0to80", animationsClips[2], true);
-      startAnimation("eauInterieurCote0to80", animationsClips[3], true);
-      startAnimation("eauPiscineCote0To80", animationsClips[4], true);
-      startAnimation("eauExterieurCote0To80", animationsClips[5], true);
-      window.setTimeout(() => {
-        props.toggleAnimation(false);
-        props.toggleScenario(false);
+    // Ne procéder que si isWaterMoving est true pour éviter les déclenchements inutiles.
+    if (!props.isWaterMoving) return;
+
+    // Afficher les côtes de l'eau qui sont cachées par défaut
+    setShowCoteMeshes(true);
+
+    // Déterminer si l'animation doit être inversée en fonction de isWaterMovingUp
+    const reverse = !props.isWaterMovingUp;
+
+    // Démarrer toutes les animations
+    const animationNames = [
+      "eauExterieur0To80",
+      "eauPiscine0To80",
+      "eauInterieur0to80",
+      "eauInterieurCote0to80",
+      "eauPiscineCote0To80",
+      "eauExterieurCote0To80",
+    ];
+
+    animationNames.forEach((name, index) => {
+      startAnimation(name, animationsClips[index], reverse);
+    });
+
+    // Définir un timeout pour mettre à jour l'état après 5 secondes
+    const timeoutId = window.setTimeout(() => {
+      props.toggleAnimation(false);
+      props.toggleScenario(!reverse);
+      if (reverse) {
         setShowCoteMeshes(false);
-      }, 5000);
-    }
-  }, [props.isWaterMoving]);
+      }
+    }, 5000);
+
+    // Cleanup function pour clear le timeout si le composant est démonté
+    return () => {
+      window.clearTimeout(timeoutId);
+    };
+  }, [
+    props.isWaterMoving,
+    props.isWaterMovingUp,
+    props.toggleAnimation,
+    props.toggleScenario,
+    animationsClips,
+  ]);
 
   // Fonction pour gérer le clic sur le bouton
   const handlePress = () => {
@@ -270,21 +302,23 @@ function Scene(props) {
   };
 
   const restart = () => {
-    // Check if the button is supposed to say "Reset"
-
+    // Vérifier si le scénario a changé et si l'eau ne monte pas ou ne descend pas
     if (
       props.isScenarioChanged &&
       !props.isWaterMovingUp &&
       !props.isWaterMoving
     ) {
-      // Call a different function when the button says "Reset"
-      props.handleReset(); // Assuming `handleReset` is the function you want to call
+      // Réinitialiser le scénario
+      props.handleReset();
     } else {
       props.toggleAnimation(true);
       props.toggleWaterMovingUp(!props.isWaterMovingUp);
     }
   };
 
+  // --- Animation de l'eau --- //
+
+  // --- Loading des objets --- //
   const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
@@ -297,7 +331,7 @@ function Scene(props) {
     return;
   }
 
-  // Helper function to get the correct ref based on the key
+  // Function d'aide pour obtenir la référence pour un certain clé
   function getRefForKey(key) {
     switch (key) {
       case "eau_exterieur":
@@ -313,9 +347,10 @@ function Scene(props) {
       case "eau_interieur_cote":
         return eauInterieurCote;
       default:
-        return null; // Default case if none matches
+        return null; // Case de défaut
     }
   }
+  // --- Loading des objets --- //
 
   return (
     <>
@@ -331,8 +366,7 @@ function Scene(props) {
       >
         {/* Affichage du modèle */}
         {Object.keys(nodes).map((key) => {
-          console.log(key);
-          // Exclure la scène du rendu
+          // Exclure la scène du rendu et les salissures
           if (
             key === "Scene" ||
             key === "structure_salissure_interieure" ||
@@ -342,8 +376,6 @@ function Scene(props) {
           }
 
           // Gérer les cas spéciaux d'eau
-          // Inside your component's return statement
-
           if (
             key === "eau_exterieur" ||
             key === "eau_piscine" ||
@@ -379,14 +411,13 @@ function Scene(props) {
             );
           }
 
-          // Render logic for other keys, if any
-
           // Cas par défaut pour les autres nœuds
           return (
             <primitive key={key} object={nodes[key]} castShadow receiveShadow />
           );
         })}
 
+        {/* Texte bouton */}
         <Text
           font="./fonts/OpenSans-Regular.woff"
           fontSize={0.2}
@@ -398,7 +429,8 @@ function Scene(props) {
         >
           Click to start water animation
         </Text>
-        {/*  Cube */}
+
+        {/* Cube */}
         <mesh
           ref={buttonCube}
           position-x={-5.5}
