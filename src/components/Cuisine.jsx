@@ -110,12 +110,12 @@ function Cuisine(props) {
   const { camera } = useThree();
 
   // tick function for camera
-  /*   useFrame((state) => {
+  useFrame((state) => {
     // Update camera position based on Leva controls
     camera.position.set(cameraX, cameraY, cameraZ);
     camera.updateProjectionMatrix();
   });
- */
+
   // Shader material
   const fragmentShader = waterFragmentShader;
   const vertexShader = waterVertexShader;
@@ -389,7 +389,7 @@ function Cuisine(props) {
 
   return (
     <>
-      {/*    <Environment path="/envMap/" files="potsdamer_platz_256.hdr" castShadow /> */}
+      {/*   <Environment path="/envMap/" files="potsdamer_platz_256.hdr" castShadow /> */}
       <directionalLight
         ref={directionalLight}
         position={dLightPosition}
@@ -413,10 +413,10 @@ function Cuisine(props) {
         /> 
       </AccumulativeShadows> */}
       <color args={["#241B27"]} attach="background" />
-      <OrbitControls makeDefault />
+      {/* <OrbitControls makeDefault /> */}
       {/*    <BakeShadows /> */}
       {/*  <SoftShadows size={25} samples={10} focus={0} /> */}
-      {/*   <OrbitControls
+      <OrbitControls
         ref={controls}
         enableZoom={orbitControls.enableZoom}
         enableRotate={orbitControls.enableRotate}
@@ -425,7 +425,7 @@ function Cuisine(props) {
         minDistance={orbitControls.minDistance}
         maxDistance={orbitControls.maxDistance}
         target={orbitControls.target}
-      /> */}
+      />
       {/* <PresentationControls
                 enabled={true} // the controls can be disabled by setting this to false
                 global={false} // Spin globally or by dragging the model

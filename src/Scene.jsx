@@ -114,9 +114,7 @@ function Scene(props) {
   const eauPiscineCote = useRef();
   const eauInterieurCote = useRef();
   const eauExterieurCote = useRef();
-  const meshRef = useRef();
   const buttonCube = useRef();
-  const materialRef = useRef();
 
   // Shader material
   const fragmentShader = waterFragmentShader;
@@ -220,6 +218,8 @@ function Scene(props) {
   });
 
   // Animations
+  const [showCoteMeshes, setShowCoteMeshes] = useState(false);
+
   const animationClip = useAnimations(animations, nodes.eau_exterieur);
   const animationsClips = [
     useAnimations(animations, nodes.eau_exterieur),
@@ -233,6 +233,7 @@ function Scene(props) {
   // Animation de l'eau
   useEffect(() => {
     if (props.isWaterMoving && props.isWaterMovingUp) {
+      setShowCoteMeshes(true);
       startAnimation("eauExterieur0To80", animationsClips[0]);
       startAnimation("eauPiscine0To80", animationsClips[1]);
       startAnimation("eauInterieur0to80", animationsClips[2]);
@@ -244,6 +245,7 @@ function Scene(props) {
         props.toggleScenario(true);
       }, 5000);
     } else if (props.isWaterMoving && !props.isWaterMovingUp) {
+      setShowCoteMeshes(true);
       startAnimation("eauExterieur0To80", animationsClips[0], true);
       startAnimation("eauPiscine0To80", animationsClips[1], true);
       startAnimation("eauInterieur0to80", animationsClips[2], true);
@@ -253,6 +255,7 @@ function Scene(props) {
       window.setTimeout(() => {
         props.toggleAnimation(false);
         props.toggleScenario(false);
+        setShowCoteMeshes(false);
       }, 5000);
     }
   }, [props.isWaterMoving]);
@@ -355,6 +358,11 @@ function Scene(props) {
                   key={`${key}-firstChild`}
                   object={nodes[key]}
                   ref={getRefForKey(key)} // Use the helper function to determine the ref
+                  visible={
+                    key === "eau_piscine" || key === "eau_piscine_cote"
+                      ? true
+                      : showCoteMeshes
+                  }
                 >
                   <shaderMaterial
                     attach="material"
