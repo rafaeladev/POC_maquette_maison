@@ -108,6 +108,36 @@ function Scene(props) {
     presetValues: { value: [1, 1, 1], step: 0.1 },
   });
 
+  const orbitControls = useControls("Orbit Controls", {
+    // enable: true,
+    // enableDamping: true,
+    // dampingFactor: 0.25,
+    enableZoom: true,
+    enableRotate: true,
+    // enablePan: true,
+    autoRotate: false,
+    autoRotateSpeed: 0.5,
+    // enableKeys: true,
+    // enableZoomSpeed: 1,
+    // enableRotateSpeed: 1,
+    // enablePanSpeed: 1,
+    // zoomSpeed: 1,
+    // rotateSpeed: 1,
+    // panSpeed: 1,
+    // minPolarAngle: 0,
+    // maxPolarAngle: Math.PI,
+    // minAzimuthAngle: -Infinity,
+    // maxAzimuthAngle: Infinity,
+    minDistance: -10,
+    maxDistance: 5,
+    // damping: 0.25,
+    // screenSpacePanning: true,
+    // keyPanSpeed: 7,
+    // dynamicDampingFactor: 0.2,
+    target: [5.5, 1, 0.2],
+    // position: [2.6, 1.6, 4.2],
+  });
+
   // ---  Debug controls --- //
 
   // --- Model --- //
@@ -205,9 +235,15 @@ function Scene(props) {
   );
   // --- Shader material --- //
 
+  // --- Camera --- //
+  const cameraPosition = new THREE.Vector3((5, 2, -2));
+  const cameraTarget = new THREE.Vector3((10, 5, 0));
+
+  // --- Camera --- //
+
   // --- Animation de l'eau --- //
   // Animation du shader material
-  useFrame(({ clock }) => {
+  useFrame(({ camera, clock }) => {
     if (
       eauExterieur.current &&
       eauInterieur.current &&
@@ -228,6 +264,8 @@ function Scene(props) {
       eauPiscineCote.current.material.uniforms.uTime.value =
         clock.getElapsedTime();
     }
+    /*    camera.position.copy(cameraPosition);
+    camera.lookAt(cameraTarget); */
   });
 
   // Animations montée de l'eau
@@ -351,8 +389,15 @@ function Scene(props) {
   return (
     <>
       <color args={["#241B27"]} attach="background" />
-
-      <OrbitControls makeDefault />
+      <OrbitControls
+        enableZoom={orbitControls.enableZoom}
+        enableRotate={orbitControls.enableRotate}
+        autoRotate={orbitControls.autoRotate}
+        autoRotateSpeed={orbitControls.autoRotateSpeed}
+        minDistance={orbitControls.minDistance}
+        maxDistance={orbitControls.maxDistance}
+        target={orbitControls.target}
+      />
 
       <Stage
         shadows={{ type: shadowType, opacity: shadowOpacity, blur: shadowBlur }}
