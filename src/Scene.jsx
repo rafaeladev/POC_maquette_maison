@@ -390,13 +390,13 @@ function Scene(props) {
     <>
       <color args={["#241B27"]} attach="background" />
       <OrbitControls
-        enableZoom={orbitControls.enableZoom}
+      /*   enableZoom={orbitControls.enableZoom}
         enableRotate={orbitControls.enableRotate}
         autoRotate={orbitControls.autoRotate}
         autoRotateSpeed={orbitControls.autoRotateSpeed}
         minDistance={orbitControls.minDistance}
         maxDistance={orbitControls.maxDistance}
-        target={orbitControls.target}
+        target={orbitControls.target} */
       />
 
       <Stage
