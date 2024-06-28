@@ -309,6 +309,7 @@ function Cuisine(props) {
           );
         }
       } else {
+        console.log("Je suis dans le else car le scenario doit changé");
         return objetAbimes.map((key, index) => {
           return (
             <primitive
@@ -326,10 +327,9 @@ function Cuisine(props) {
         });
       }
     });
-  }, [objetsPasAbimes, nodes]);
+  }, [objetsPasAbimes, nodes, props.isScenarioChanged]);
 
   // Animation niveau d'eau
-
   const animationsClips = [
     useAnimations(animations, nodes.Eau_exterieur),
     useAnimations(animations, nodes.Eau_piscine),
@@ -354,7 +354,7 @@ function Cuisine(props) {
         props.toggleAnimation(false);
       }, 5000);
     }
-  }, [props.isWaterMoving]);
+  }, [props.isWaterMoving, props.isWaterMovingUp, animationsClips]);
 
   useFrame(({ clock }) => {
     eauExterieur.current.material.uniforms.uTime.value = clock.getElapsedTime();

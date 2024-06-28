@@ -20,6 +20,7 @@ function Home() {
   const [isWaterMoving, setIsWaterMoving] = useState(false);
   const [isWaterMovingUp, setIsWaterMovingUp] = useState(false);
   const [isReset, setIsReset] = useState(false);
+  const [resetKey, setResetKey] = useState(0);
 
   const toggleWaterMovingUp = () => {
     setIsWaterMovingUp((prev) => !prev);
@@ -33,11 +34,16 @@ function Home() {
     setIsScenarioChanged((prev) => !prev); // Toggle entre true et false
   };
 
-  const handleReset = () => {
+  const toggleReset = () => {
     setIsReset((prev) => !prev);
+  };
+
+  const handleReset = () => {
+    toggleReset(true);
     setIsScenarioChanged(false);
     setIsWaterMoving(false);
     setIsWaterMovingUp(false);
+    setResetKey((prevKey) => prevKey + 1); // Change the key to force a re-render
   };
 
   const { dLightPosition, dLightIntensity } = useControls("Directional Light", {
@@ -91,29 +97,29 @@ function Home() {
                             scale: envMapScale,
                         }}
                     /> */}
-            {/*  <ambientLight intensity={0.1} />
-          <directionalLight
-            position={dLightPosition}
-            intensity={dLightIntensity}
-            castShadow
-          /> */}
-            {/*   <spotLight
-            position={sLightPosition}
-            angle={sLightAngle}
-            penumbra={sLightPenumbra}
-            castShadow
-          /> */}
-            {/*     <Suspense fallback={null}>
-            <Cuisine
-              isScenarioChanged={isScenarioChanged}
-              toggleScenario={toggleScenario}
-              toggleAnimation={toggleWaterMoving}
-              isWaterMoving={isWaterMoving}
-              isWaterMovingUp={isWaterMovingUp}
-              toggleReset={handleReset}
-              isReset={isReset}
+            <ambientLight intensity={0.1} />
+            <directionalLight
+              position={dLightPosition}
+              intensity={dLightIntensity}
+              castShadow
             />
-          </Suspense> */}
+            {/*  <spotLight
+              position={sLightPosition}
+              angle={sLightAngle}
+              penumbra={sLightPenumbra}
+              castShadow
+            /> */}
+            <Suspense fallback={null}>
+              <Cuisine
+                isScenarioChanged={isScenarioChanged}
+                toggleScenario={toggleScenario}
+                toggleAnimation={toggleWaterMoving}
+                isWaterMoving={isWaterMoving}
+                isWaterMovingUp={isWaterMovingUp}
+                toggleReset={handleReset}
+                isReset={isReset}
+              />
+            </Suspense>
             {/* <Sky
             distance={450000}
             sunPosition={[0, 1, 0]}
@@ -121,7 +127,7 @@ function Home() {
             azimuth={0.25}
           /> */}
 
-            <Scene
+            {/*  <Scene
               isScenarioChanged={isScenarioChanged}
               toggleScenario={toggleScenario}
               toggleAnimation={toggleWaterMoving}
@@ -130,20 +136,21 @@ function Home() {
               isWaterMovingUp={isWaterMovingUp}
               toggleReset={handleReset}
               isReset={isReset}
-            />
+            /> */}
           </Canvas>
         </div>
       </Suspense>
 
-      {/*   <Interface
-          toggleWaterMovingUp={toggleWaterMovingUp}
-          toggleWaterMoving={toggleWaterMoving}
-          isWaterMovingUp={isWaterMovingUp}
-          isWaterMoving={isWaterMoving}
-          isScenarioChanged={isScenarioChanged}
-          handleReset={handleReset}
-          isReset={isReset}
-        /> */}
+      <Interface
+        toggleWaterMovingUp={toggleWaterMovingUp}
+        toggleWaterMoving={toggleWaterMoving}
+        isWaterMovingUp={isWaterMovingUp}
+        isWaterMoving={isWaterMoving}
+        isScenarioChanged={isScenarioChanged}
+        handleReset={handleReset}
+        isReset={isReset}
+        toggleReset={toggleReset}
+      />
 
       {/* )} */}
     </>
