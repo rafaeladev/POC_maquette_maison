@@ -5,7 +5,15 @@
 import React, { useRef, useEffect, useState, useMemo } from 'react';
 
 // imports drei
-import { OrbitControls, Environment, useAnimations, Text, Stage } from '@react-three/drei';
+import {
+    OrbitControls,
+    Environment,
+    useAnimations,
+    Text,
+    Stage,
+    useHelper,
+    Sky,
+} from '@react-three/drei';
 
 // imports React Three Fiber
 import { useFrame, useLoader } from '@react-three/fiber';
@@ -151,6 +159,15 @@ function Scene(props) {
         // position: [2.6, 1.6, 4.2],
     });
 
+    const { dLightPosition, dLightIntensity } = useControls('Directional Light', {
+        dLightPosition: { value: [-7.2, 8.4, 7.1], step: 0.1 },
+        dLightIntensity: { value: 1.0, step: 0.1 },
+    });
+
+    const { sunPosition } = useControls('sky', {
+        sunPosition: { value: [1, 2, 3] },
+    });
+
     // ---  Debug controls --- //
 
     // --- Model --- //
@@ -201,6 +218,12 @@ function Scene(props) {
     // --- Textures --- //
 
     // --- Textures --- //
+
+    // --- Lights --- //
+    const directionalLight = useRef();
+    useHelper(directionalLight, THREE.DirectionalLightHelper, 1);
+
+    // --- Lights --- //
 
     // --- Shader material --- //
     const fragmentShader = waterFragmentShader;
@@ -444,6 +467,21 @@ function Scene(props) {
                 preset={preset}
                 intensity={stageIntensity}
             > */}
+
+            <directionalLight
+                ref={directionalLight}
+                position={[-7.2, 8.4, 7.1]}
+                intensity={dLightIntensity}
+                castShadow
+                shadow-mapSize={[1024, 1024]}
+                shadow-camera-near={1}
+                shadow-camera-far={10}
+                shadow-camera-top={5}
+                shadow-camera-right={5}
+                shadow-camera-bottom={-5}
+                shadow-camera-left={-5}
+            />
+
             {/* Affichage du modèle */}
             {Object.keys(nodes).map((key) => {
                 // Exclure la scène du rendu et les salissures
