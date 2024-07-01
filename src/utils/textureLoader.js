@@ -1,21 +1,37 @@
-import { useLoader } from "@react-three/fiber";
-import { TextureLoader } from "three";
-import textures from "../data/textures.json";
+import { TextureLoader } from 'three';
+import textures from '../data/textures.json';
 
-export const useTextures = (materialName) => {
-  const material = textures.materials[materialName];
+const textureCache = {};
 
-  if (!material) {
-    throw new Error(`Material ${materialName} not found in textures.json`);
-  }
+export const loadTextures = async (materialName) => {
+    if (!textures.materials[materialName]) {
+        throw new Error(`Material ${materialName} not found in textures.json`);
+    }
 
-  const texturePaths = Object.values(material);
-  const texturesArray = useLoader(TextureLoader, texturePaths);
+    if (textureCache[materialName]) {
+        return textureCache[materialName];
+    }
 
-  const loadedTextures = {};
-  Object.keys(material).forEach((key, index) => {
-    loadedTextures[key] = texturesArray[index];
-  });
+    const loader = new TextureLoader();
+    const texturePaths = textures.materials[materialName];
 
-  return loadedTextures;
+    const loadedTextures = await Promise.all(
+        Object.keys(texturePaths).map((key) => {
+            return new Promise((resolve, reject) => {
+                loader.load(
+                    texturePaths[key],
+                    (texture) => resolve({ [key]: texture }),
+                    undefined,
+                    (error) => reject(error)
+                );
+            });
+        })
+    );
+
+    const textureObject = loadedTextures.reduce((acc, texture) => {
+        return { ...acc, ...texture };
+    }, {});
+
+    textureCache[materialName] = textureObject;
+    return textureObject;
 };
