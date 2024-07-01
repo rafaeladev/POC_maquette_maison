@@ -1,0 +1,110 @@
+{
+  "materials": {
+    "asphalt": {
+      "colorMap": "./textures/asphalt/asphalt_diffuse.png",
+      "normalMap": "./textures/asphalt/asphalt_normal.png",
+      "roughnessMap": "./textures/asphalt/asphalt_rough.png"
+    },
+    "asphalt_dirty": {
+      "colorMap": "./textures/asphalt_dirty/asphalt_dirty_diffuse.png",
+      "normalMap": "./textures/asphalt/asphalt_normal.png",
+      "roughnessMap": "./textures/asphalt_dirty/asphalt_dirty_rough.png"
+    },
+    "carpet": {
+      "colorMap": "./textures/carpet/carpet_diffuse.jpg",
+      "normalMap": "./textures/carpet/carpet_normal.png",
+      "roughnessMap": "./textures/carpet/carpet_rough.jpg"
+    },
+    "carpet_dirty": {
+      "colorMap": "./textures/carpet_dirty/carpet_dirty_diffuse.png",
+      "normalMap": "./textures/carpet/carpet_normal.png",
+      "roughnessMap": "./textures/carpet_dirty/carpet_dirty_rough.png"
+    },
+    "concrete": {
+      "colorMap": "./textures/concrete/concrete_diffuse.png",
+      "normalMap": "./textures/concrete/concrete_normal.png",
+      "roughnessMap": "./textures/concrete/concrete_rough.png"
+    },
+    "concrete_dirty": {
+      "colorMap": "./textures/concrete_dirty/concrete_dirty_diffuse.png",
+      "normalMap": "./textures/concrete/concrete_normal.png",
+      "roughnessMap": "./textures/concrete_dirty/concrete_dirty_rough.png"
+    },
+    "floor_bathroom": {
+      "colorMap": "./textures/floor_bathroom/floor_bathroom_diffuse.png",
+      "normalMap": "./textures/floor_bathroom/floor_bathroom_normal.png",
+      "roughnessMap": "./textures/floor_bathroom/floor_bathroom_rough.png"
+    },
+    "floor_bathroom_dirty": {
+      "colorMap": "./textures/floor_bathroom_dirty/floor_bathroom_dirty_diffuse.png",
+      "normalMap": "./textures/floor_bathroom/floor_bathroom_normal.png",
+      "roughnessMap": "./textures/floor_bathroom_dirty/floor_bathroom_dirty_rough.png"
+    },
+    "floor_kitchen": {
+      "colorMap": "./textures/floor_kitchen/floor_kitchen_diffuse.png",
+      "normalMap": "./textures/floor_kitchen/floor_kitchen_normal.png",
+      "roughnessMap": "./textures/floor_kitchen/floor_kitchen_rough.png"
+    },
+    "floor_kitchen_dirty": {
+      "colorMap": "./textures/floor_kitchen_dirty/floor_kitchen_dirty_diffuse.png",
+      "normalMap": "./textures/floor_kitchen/floor_kitchen_normal.png",
+      "roughnessMap": "./textures/floor_kitchen_dirty/floor_kitchen_dirty_rough.png"
+    },
+    "floor_living_room": {
+      "colorMap": "./textures/floor_living_room/floor_living_room_diffuse.png",
+      "normalMap": "./textures/floor_living_room/floor_living_room_normal.png",
+      "roughnessMap": "./textures/floor_living_room/floor_living_room_rough.png"
+    },
+    "floor_living_room_dirty": {
+      "colorMap": "./textures/floor_living_room_dirty/floor_living_room_dirty_diffuse.png",
+      "normalMap": "./textures/floor_living_room_dirty/floor_living_room_dirty_normal.png",
+      "roughnessMap": "./textures/floor_living_room_dirty/floor_living_room_dirty_rough.png"
+    },
+    "grass": {
+      "colorMap": "./textures/grass/grass_diffuse.png",
+      "normalMap": "./textures/grass/grass_normal.png",
+      "roughnessMap": "./textures/grass/grass_rough.png"
+    },
+    "grass_dirty": {
+      "colorMap": "./textures/grass_dirty/grass_dirty_diffuse.png",
+      "normalMap": "./textures/grass/grass_normal.png",
+      "roughnessMap": "./textures/grass_dirty/grass_dirty_diffuse.png"
+    },
+    "leather_dirty": {
+      "colorMap": "./textures/leather_dirty/leather_dirty_diffuse.png",
+      "roughnessMap": "./textures/leather_dirty/leather_dirty_rough.png"
+    },
+    "platic_black_dirty": {
+      "colorMap": "./textures/platic_black_dirty/plastic_black_dirty_diffuse.png",
+      "roughnessMap": "./textures/platic_black_dirty/plastic_black_dirty_rough.png"
+    },
+    "plastic_white_dirty": {
+      "colorMap": "./textures/plastic_white_dirty/plastic_white_dirty_diffuse.png",
+      "roughnessMap": "./textures/plastic_white_dirty/plastic_white_dirty_rough.png"
+    },
+    "rooftop": {
+      "colorMap": "./textures/rooftop/rooftop_color.png",
+      "normalMap": "./textures/rooftop/rooftop_normal.png",
+      "roughnessMap": "./textures/rooftop/rooftop_rough.png"
+    },
+    "vegetation_dirty": {
+      "colorMap": "./textures/vegetation_dirty/vegetation_dirty_diffuse.png",
+      "roughnessMap": "./textures/vegetation_dirty/vegetation_dirty_rough.png"
+    },
+    "wall_exterior": {
+      "colorMap": "./textures/wall_exterior/wall_exterior_diffuse.png",
+      "normalMap": "./textures/wall_exterior/wall_exterior_normal.png",
+      "roughnessMap": "./textures/wall_exterior/wall_exterior_rough.png"
+    },
+    "wood": {
+      "colorMap": "./textures/wood/wood_diffuse.png",
+      "normalMap": "./textures/wood/wood_normal.png",
+      "roughnessMap": "./textures/wood/wood_rough.png"
+    },
+    "wood_dirty": {
+      "colorMap": "./textures/wood_dirty/wood_dirty_diffuse.png",
+      "normalMap": "./textures/wood_dirty/wood_dirty_normal.png",
+      "roughnessMap": "./textures/wood_dirty/wood_dirty_rough.png"
+    }
+  }
+}

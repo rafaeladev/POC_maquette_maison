@@ -28,11 +28,22 @@ import waterFragmentShaderSide from "./shaders/waterSide/fragment.glsl";
 // imports des composants
 import { useControls } from "leva";
 
-// imports des animations
+// imports des utils .js
 import { startAnimation } from "./utils/WaterAnimation.js";
+import { useTextures } from "./utils/textureLoader.js";
 
 // Approche  n°2 avec Water from three-stdlib
 import Ocean from "./Ocean.jsx";
+
+const applyMaterial = (node, materialName) => {
+  const textures = useTextures(materialName);
+
+  node.material = new THREE.MeshStandardMaterial({
+    map: textures.colorMap,
+    normalMap: textures.normalMap,
+    roughnessMap: textures.roughnessMap,
+  });
+};
 
 function Scene(props) {
   // ---  Debug controls --- //
@@ -143,8 +154,21 @@ function Scene(props) {
   // --- Model --- //
   const { nodes, animations } = useLoader(
     GLTFLoader,
-    "./model/Maquette_v1.glb"
+    "./model/Maquette_v4.glb"
   );
+
+  React.useEffect(() => {
+    Object.keys(nodes).forEach((key) => {
+      const node = nodes[key];
+
+      if (node && node.material) {
+        const materialName = node.material.name;
+        if (materialName) {
+          applyMaterial(node, materialName);
+        }
+      }
+    });
+  }, [nodes]);
 
   // Ref
   const eauPiscine = useRef();
@@ -156,6 +180,32 @@ function Scene(props) {
   const buttonCube = useRef();
 
   // --- Model --- //
+
+  // --- Textures --- //
+  const asphalt = useTextures("asphalt");
+  const carpet = useTextures("carpet");
+  const concrete = useTextures("concrete");
+  const floor_bathroom = useTextures("floor_bathroom");
+  const floor_kitchen = useTextures("floor_kitchen");
+  const floor_living_room = useTextures("floor_living_room");
+  const grass = useTextures("grass");
+  const rooftop = useTextures("rooftop");
+  const wall_exterior = useTextures("wall_exterior");
+  const wood = useTextures("wood");
+  /*   console.log(
+    asphalt,
+    carpet,
+    concrete,
+    floor_bathroom,
+    floor_kitchen,
+    floor_living_room,
+    grass,
+    rooftop,
+    wall_exterior,
+    wood
+  ); */
+
+  // --- Textures --- //
 
   // --- Shader material --- //
   const fragmentShader = waterFragmentShader;

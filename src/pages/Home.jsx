@@ -109,7 +109,7 @@ function Home() {
               penumbra={sLightPenumbra}
               castShadow
             /> */}
-            <Suspense fallback={null}>
+            {/*  <Suspense fallback={null}>
               <Cuisine
                 isScenarioChanged={isScenarioChanged}
                 toggleScenario={toggleScenario}
@@ -119,7 +119,7 @@ function Home() {
                 toggleReset={handleReset}
                 isReset={isReset}
               />
-            </Suspense>
+            </Suspense> */}
             {/* <Sky
             distance={450000}
             sunPosition={[0, 1, 0]}
@@ -127,7 +127,7 @@ function Home() {
             azimuth={0.25}
           /> */}
 
-            {/*  <Scene
+            <Scene
               isScenarioChanged={isScenarioChanged}
               toggleScenario={toggleScenario}
               toggleAnimation={toggleWaterMoving}
@@ -136,12 +136,12 @@ function Home() {
               isWaterMovingUp={isWaterMovingUp}
               toggleReset={handleReset}
               isReset={isReset}
-            /> */}
+            />
           </Canvas>
         </div>
       </Suspense>
 
-      <Interface
+      {/*   <Interface
         toggleWaterMovingUp={toggleWaterMovingUp}
         toggleWaterMoving={toggleWaterMoving}
         isWaterMovingUp={isWaterMovingUp}
@@ -150,7 +150,7 @@ function Home() {
         handleReset={handleReset}
         isReset={isReset}
         toggleReset={toggleReset}
-      />
+      /> */}
 
       {/* )} */}
     </>
