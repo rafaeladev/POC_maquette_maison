@@ -41,6 +41,7 @@ import { TextureLoader } from "three";
 // Approche  n°2 avec Water from three-stdlib
 import Ocean from "./Ocean.jsx";
 
+// Fonction pour appliquer les textures aux objets
 const applyMaterial = (node, loadedTextures, name) => {
   const materialOptions = {
     map: loadedTextures.colorMap || null,
@@ -54,13 +55,18 @@ const applyMaterial = (node, loadedTextures, name) => {
     materialOptions.normalMap.wrapT = THREE.RepeatWrapping;
   }
 
-  materialOptions.map.wrapS = THREE.RepeatWrapping;
-  materialOptions.map.wrapT = THREE.RepeatWrapping;
+  if (materialOptions.map) {
+    materialOptions.map.wrapS = THREE.RepeatWrapping;
+    materialOptions.map.wrapT = THREE.RepeatWrapping;
+  }
 
-  materialOptions.roughnessMap.wrapS = THREE.RepeatWrapping;
-  materialOptions.roughnessMap.wrapT = THREE.RepeatWrapping;
+  if (materialOptions.roughnessMap) {
+    materialOptions.roughnessMap.wrapS = THREE.RepeatWrapping;
+    materialOptions.roughnessMap.wrapT = THREE.RepeatWrapping;
+  }
 
   node.material = new THREE.MeshStandardMaterial(materialOptions);
+  node.material.needsUpdate = true;
 };
 
 function Scene(props) {
@@ -195,30 +201,52 @@ function Scene(props) {
 
   // --- Textures --- //
   const [texturesLoaded, setTexturesLoaded] = useState(false);
-  const [changeTextures, setChangeTextures] = useState(false);
+
+  const [originalTextures, setOriginalTextures] = useState({});
+
+  // Fonction pour charger les textures
+  const handleTextureLoading = async (nodes, textureAction) => {
+    const promises = Object.keys(nodes).map(async (key) => {
+      const node = nodes[key];
+
+      if (node && node.material) {
+        const materialName = node.material.name;
+        let targetMaterialName = materialName;
+
+        if (textureAction === "change") {
+          targetMaterialName = `${materialName}_sale`;
+        } else if (textureAction === "reset") {
+          targetMaterialName = materialName.replace("_sale", "");
+        }
+
+        if (materialName && textures.materials[targetMaterialName]) {
+          try {
+            const loadedTextures = await loadTextures(targetMaterialName);
+            applyMaterial(node, loadedTextures, targetMaterialName);
+
+            if (textureAction === "load") {
+              // Save original textures
+              setOriginalTextures((prev) => ({
+                ...prev,
+                [materialName]: loadedTextures,
+              }));
+            }
+          } catch (error) {
+            console.error(
+              `Failed to load textures for material ${targetMaterialName}:`,
+              error
+            );
+          }
+        }
+      }
+    });
+
+    await Promise.all(promises);
+  };
 
   useEffect(() => {
     const loadAllTextures = async () => {
-      const promises = Object.keys(nodes).map(async (key) => {
-        const node = nodes[key];
-
-        if (node && node.material) {
-          const materialName = node.material.name;
-          if (materialName && textures.materials[materialName]) {
-            try {
-              const loadedTextures = await loadTextures(materialName);
-              applyMaterial(node, loadedTextures, materialName);
-            } catch (error) {
-              console.error(
-                `Failed to load textures for material ${materialName}:`,
-                error
-              );
-            }
-          }
-        }
-      });
-
-      await Promise.all(promises);
+      await handleTextureLoading(nodes, "load");
       setTexturesLoaded(true);
     };
 
@@ -226,53 +254,39 @@ function Scene(props) {
   }, [nodes]);
 
   useEffect(() => {
-    if (changeTextures) {
+    if (props.changeTextures) {
       const loadAllTextures = async () => {
-        const promises = Object.keys(nodes).map(async (key) => {
-          const node = nodes[key];
-
-          if (node && node.material) {
-            const materialName = node.material.name;
-            const newMaterialName = `${materialName}_sale`;
-            if (materialName && textures.materials[newMaterialName]) {
-              try {
-                const loadedTextures = await loadTextures(newMaterialName);
-                applyMaterial(node, loadedTextures, newMaterialName);
-              } catch (error) {
-                console.error(
-                  `Failed to load textures for material ${newMaterialName}:`,
-                  error
-                );
-              }
-            }
-          }
-        });
-
-        await Promise.all(promises);
+        await handleTextureLoading(nodes, "change");
         setTexturesLoaded(true);
       };
 
       loadAllTextures();
     }
-  }, [changeTextures]);
+  }, [props.changeTextures]);
 
-  /*  useEffect(() => {
-    const colorMap = useLoader(
-      TextureLoader,
-      textures.materials.asphalt_sale.colorMap
-    );
-    const normalMap = useLoader(
-      TextureLoader,
-      textures.materials.asphalt_sale.normalMap
-    );
-    const roughMap = useLoader(
-      TextureLoader,
-      textures.materials.asphalt_sale.roughMap
-    );
+  useEffect(() => {
+    console.log(props.resetTextures);
+    if (props.resetTextures) {
+      console.log("Reset textures");
+      const resetAllTextures = async () => {
+        await handleTextureLoading(nodes, "reset");
+      };
 
-    console.log(colorMap, normalMap, roughMap);
-  }, []);
- */
+      resetAllTextures();
+
+      if (waterMaterialRef.current) {
+        waterMaterialRef.current.uniforms.uDepthColor.value.set("#5e98ba");
+        waterMaterialRef.current.uniforms.uSurfaceColor.value.set("#c1def5");
+      }
+      if (waterMaterialSideRef.current) {
+        waterMaterialSideRef.current.uniforms.uDepthColor.value.set("#5e98ba");
+        waterMaterialSideRef.current.uniforms.uSurfaceColor.value.set(
+          "#c1def5"
+        );
+      }
+    }
+  }, [props.resetTextures, originalTextures, nodes]);
+
   // --- Textures --- //
 
   // Ref
@@ -281,20 +295,14 @@ function Scene(props) {
   const eauPiscineCote = useRef();
   const eauExterieurCote = useRef();
   const cameraRef = useRef();
-  const cameraControlsRef = useRef();
-
   const waterMaterialRef = useRef();
   const waterMaterialSideRef = useRef();
-
-  /*   const depthColor = useRef(new THREE.Color("#5e98ba"));
-  const surfaceColor = useRef(new THREE.Color("#c1def5")); */
 
   // --- Model --- //
 
   // --- Lights --- //
   const directionalLight = useRef();
   /*  useHelper(directionalLight, THREE.DirectionalLightHelper, 1); */
-
   // --- Lights --- //
 
   // --- Shader material --- //
@@ -388,7 +396,6 @@ function Scene(props) {
   // --- Camera --- //
 
   // --- Animation de l'eau --- //
-
   // Animation du shader material
   useFrame(({ camera, clock }) => {
     if (
@@ -417,6 +424,13 @@ function Scene(props) {
   // Animations montée de l'eau
   const [showCoteMeshes, setShowCoteMeshes] = useState(false);
 
+  const animationNames = [
+    "eauExterieur0To80",
+    "eauPiscine0To80",
+    "eauPiscineCote0To80",
+    "eauExterieurCote0To80",
+  ];
+
   const animationsClips = [
     useAnimations(animations, nodes.eau_exterieur),
     useAnimations(animations, nodes.eau_piscine),
@@ -424,7 +438,7 @@ function Scene(props) {
     useAnimations(animations, nodes.eau_exterieur_cote),
   ];
 
-  // Animation de l'eau
+  // Animation de l'eau avec useEffect pour gérer les déclenchements
   useEffect(() => {
     // Ne procéder que si isWaterMoving est true pour éviter les déclenchements inutiles.
     if (!props.isWaterMoving) return;
@@ -435,67 +449,48 @@ function Scene(props) {
     // Déterminer si l'animation doit être inversée en fonction de isWaterMovingUp
     const reverse = !props.isWaterMovingUp;
 
-    // Démarrer toutes les animations
-    const animationNames = [
-      "eauExterieur0To80",
-      "eauPiscine0To80",
-      "eauPiscineCote0To80",
-      "eauExterieurCote0To80",
-    ];
+    let timeoutId;
 
-    animationNames.forEach((name, index) => {
-      startAnimation(name, animationsClips[index], reverse);
-    });
+    if (props.isWaterMoving && props.isWaterMovingUp) {
+      /* console.log("Animation démarrée", props.isWaterMoving); */
+      animationNames.forEach((name, index) => {
+        startAnimation(name, animationsClips[index], reverse);
+      });
 
-    // Définir un timeout pour mettre à jour l'état après 5 secondes
-    const timeoutId = window.setTimeout(() => {
-      props.toggleAnimation(false);
-      props.toggleScenario(!reverse);
-      // Mettre à jour les couleurs des shaders
-      if (waterMaterialRef.current) {
-        waterMaterialRef.current.uniforms.uDepthColor.value.set("#b0a997");
-        waterMaterialRef.current.uniforms.uSurfaceColor.value.set("#e3cfcf");
-      }
-      if (waterMaterialSideRef.current) {
-        waterMaterialSideRef.current.uniforms.uDepthColor.value.set("#b0a997");
-        waterMaterialSideRef.current.uniforms.uSurfaceColor.value.set(
-          "#e3cfcf"
-        );
-      }
-      if (reverse) {
+      timeoutId = window.setTimeout(() => {
+        props.toggleScenario(true);
+        props.toggleAnimation(false);
+
+        props.toggleTextures(true);
+        if (waterMaterialRef.current) {
+          waterMaterialRef.current.uniforms.uDepthColor.value.set("#b0a997");
+          waterMaterialRef.current.uniforms.uSurfaceColor.value.set("#e3cfcf");
+        }
+        if (waterMaterialSideRef.current) {
+          waterMaterialSideRef.current.uniforms.uDepthColor.value.set(
+            "#b0a997"
+          );
+          waterMaterialSideRef.current.uniforms.uSurfaceColor.value.set(
+            "#e3cfcf"
+          );
+        }
+      }, 5000);
+    } else if (props.isWaterMoving && !props.isWaterMovingUp) {
+      animationNames.forEach((name, index) => {
+        startAnimation(name, animationsClips[index], reverse);
+      });
+
+      timeoutId = window.setTimeout(() => {
+        props.toggleAnimation();
         setShowCoteMeshes(false);
-      }
-      if (props.isScenarioChanged) {
-        setChangeTextures(true);
-      }
-    }, 5000);
-
-    // Cleanup function pour clear le timeout si le composant est démonté
+        props.toggleReset();
+        /*   props.toggleTextures(); */
+      }, 5000);
+    }
     return () => {
       window.clearTimeout(timeoutId);
     };
-  }, [
-    props.isWaterMoving,
-    props.isWaterMovingUp,
-    props.toggleAnimation,
-    props.toggleScenario,
-    animationsClips,
-  ]);
-
-  const restart = () => {
-    // Vérifier si le scénario a changé et si l'eau ne monte pas ou ne descend pas
-    if (
-      props.isScenarioChanged &&
-      !props.isWaterMovingUp &&
-      !props.isWaterMoving
-    ) {
-      // Réinitialiser le scénario
-      props.handleReset();
-    } else {
-      props.toggleAnimation(true);
-      props.toggleWaterMovingUp(!props.isWaterMovingUp);
-    }
-  };
+  }, [props.isWaterMoving, props.isWaterMovingUp, animationsClips]);
 
   // --- Animation de l'eau --- //
 
@@ -525,6 +520,7 @@ function Scene(props) {
   }
   // --- Loading des objets --- //
 
+  // --- Render --- //
   return (
     <>
       <color args={["#241B27"]} attach="background" />
@@ -567,7 +563,7 @@ function Scene(props) {
             key === "structure_salissure_interieure" ||
             key === "structure_salissure_exterieure"
           ) {
-            if (!changeTextures) {
+            if (!props.changeTextures) {
               return null;
             }
           }

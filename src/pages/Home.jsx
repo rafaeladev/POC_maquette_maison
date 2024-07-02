@@ -23,6 +23,9 @@ function Home() {
   const [isReset, setIsReset] = useState(false);
   const [resetKey, setResetKey] = useState(0);
 
+  const [changeTextures, setChangeTextures] = useState(false);
+  const [resetTextures, setResetTextures] = useState(false);
+
   const toggleWaterMovingUp = () => {
     setIsWaterMovingUp((prev) => !prev);
   };
@@ -39,12 +42,24 @@ function Home() {
     setIsReset((prev) => !prev);
   };
 
+  const toggleTextures = () => {
+    setChangeTextures((prev) => !prev);
+  };
+
   const handleReset = () => {
-    toggleReset(true);
-    setIsScenarioChanged(false);
-    setIsWaterMoving(false);
-    setIsWaterMovingUp(false);
+    setIsReset(true);
+    setIsScenarioChanged();
+    setIsWaterMoving();
+    setIsWaterMovingUp();
     setResetKey((prevKey) => prevKey + 1); // Change the key to force a re-render
+
+    setChangeTextures(false);
+    setResetTextures(true);
+
+    setTimeout(() => {
+      setIsReset(false);
+      setResetTextures(false);
+    }, 100); // Reset the reset state after a short delay to allow re-rendering
   };
 
   const { dLightPosition, dLightIntensity } = useControls("Directional Light", {
@@ -138,8 +153,11 @@ function Home() {
               toggleWaterMovingUp={toggleWaterMovingUp}
               isWaterMoving={isWaterMoving}
               isWaterMovingUp={isWaterMovingUp}
-              toggleReset={handleReset}
+              toggleReset={toggleReset}
               isReset={isReset}
+              resetTextures={resetTextures}
+              changeTextures={changeTextures}
+              toggleTextures={toggleTextures}
             />
           </Canvas>
         </div>
