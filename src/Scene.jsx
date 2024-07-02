@@ -43,12 +43,30 @@ import Ocean from "./Ocean.jsx";
 
 // Fonction pour appliquer les textures aux objets
 const applyMaterial = (node, loadedTextures, name) => {
-  const materialOptions = {
-    map: loadedTextures.colorMap || null,
-    normalMap: loadedTextures.normalMap || null,
-    roughnessMap: loadedTextures.roughnessMap || null,
-    name: name,
-  };
+  let materialOptions;
+
+  if (
+    name === "plastique_blanc" ||
+    name === "Plastique_noir" ||
+    name === "plante"
+  ) {
+    materialOptions = {
+      color:
+        name === "plastique_blanc"
+          ? 0xffffff
+          : name === "Plastique_noir"
+          ? 0x000000
+          : 0x6e7d65,
+      name: name,
+    };
+  } else {
+    materialOptions = {
+      map: loadedTextures.colorMap || null,
+      normalMap: loadedTextures.normalMap || null,
+      roughnessMap: loadedTextures.roughnessMap || null,
+      name: name,
+    };
+  }
 
   if (materialOptions.normalMap) {
     materialOptions.normalMap.wrapS = THREE.RepeatWrapping;
@@ -237,6 +255,12 @@ function Scene(props) {
               error
             );
           }
+        } else if (
+          targetMaterialName === "plastique_blanc" ||
+          targetMaterialName === "Plastique_noir" ||
+          targetMaterialName === "plante"
+        ) {
+          applyMaterial(node, null, targetMaterialName);
         }
       }
     });
@@ -265,7 +289,6 @@ function Scene(props) {
   }, [props.changeTextures]);
 
   useEffect(() => {
-    console.log(props.resetTextures);
     if (props.resetTextures) {
       console.log("Reset textures");
       const resetAllTextures = async () => {

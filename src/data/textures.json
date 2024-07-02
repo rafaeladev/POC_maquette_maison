@@ -74,10 +74,9 @@
       "colorMap": "./textures/cuir_sale/cuir_sale_diffuse.png",
       "roughnessMap": "./textures/cuir_sale/cuir_sale_rough.png"
     },
-
-    "Plastique_blanc_sale": {
-      "colorMap": "./textures/plastique_blanc_sale/plastique_blanc_sale_diffuse.png",
-      "roughnessMap": "./textures/plastique_blanc_sale/plastique_blanc_sale_rough.png"
+    "Plastique_noir_sale": {
+      "colorMap": "./textures/Plastique_noir_sale/plastique_noir_sale_diffuse.png",
+      "roughnessMap": "./textures/Plastique_noir_sale/plastique_noir_sale_rough.png"
     },
     "plastique_blanc_sale": {
       "colorMap": "./textures/plastique_blanc_sale/plastique_blanc_sale_diffuse.png",
@@ -88,9 +87,9 @@
       "normalMap": "./textures/toit/toit_normal.png",
       "roughnessMap": "./textures/toit/toit_rough.png"
     },
-    "vegetation_sale": {
-      "colorMap": "./textures/vegetation_sale/vegetation_sale_diffuse.png",
-      "roughnessMap": "./textures/vegetation_sale/vegetation_sale_rough.png"
+    "plante_sale": {
+      "colorMap": "./textures/plante_sale/plante_sale_diffuse.png",
+      "roughnessMap": "./textures/plante_sale/plante_sale_rough.png"
     },
     "Mur_exterieur": {
       "colorMap": "./textures/mur_exterieur/mur_exterieur_diffuse.png",
