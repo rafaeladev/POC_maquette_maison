@@ -45,7 +45,7 @@
       "normalMap": "./textures/sol_cuisine/sol_cuisine_normal.png",
       "roughnessMap": "./textures/sol_cuisine/sol_cuisine_rough.png"
     },
-    "sol_cuisine_sale": {
+    "cuisine_sol_sale": {
       "colorMap": "./textures/sol_cuisine_sale/sol_cuisine_sale_diffuse.png",
       "normalMap": "./textures/sol_cuisine/sol_cuisine_normal.png",
       "roughnessMap": "./textures/sol_cuisine_sale/sol_cuisine_sale_rough.png"
@@ -74,9 +74,10 @@
       "colorMap": "./textures/cuir_sale/cuir_sale_diffuse.png",
       "roughnessMap": "./textures/cuir_sale/cuir_sale_rough.png"
     },
-    "plastique_noir_sale": {
-      "colorMap": "./textures/platic_noir_sale/plastique_noir_sale_diffuse.png",
-      "roughnessMap": "./textures/platic_noir_sale/plastique_noir_sale_rough.png"
+
+    "Plastique_blanc_sale": {
+      "colorMap": "./textures/plastique_blanc_sale/plastique_blanc_sale_diffuse.png",
+      "roughnessMap": "./textures/plastique_blanc_sale/plastique_blanc_sale_rough.png"
     },
     "plastique_blanc_sale": {
       "colorMap": "./textures/plastique_blanc_sale/plastique_blanc_sale_diffuse.png",
@@ -108,5 +109,3 @@
     }
   }
 }
-
-
