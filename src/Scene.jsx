@@ -7,12 +7,14 @@ import React, { useRef, useEffect, useState, useMemo } from "react";
 // imports drei
 import {
   OrbitControls,
-  Environment,
   useAnimations,
   Text,
   Stage,
   useHelper,
   Sky,
+  BakeShadows,
+  ContactShadows,
+  SoftShadows,
 } from "@react-three/drei";
 
 // imports React Three Fiber
@@ -132,11 +134,20 @@ function Scene(props) {
       uOpacity: { value: 0.2, min: 0, max: 1, step: 0.01 },
     });
 
+  /*   const { contactShadowPosition } = useControls("Contact Shadow", {
+    position: { value: [0, 0, 0], step: 0.01 },
+  }); */
+
   /*   const { position, rotation } = useControls("Text", {
     position: { value: [-5.53, -2.27, 0], step: 0.01 },
     rotation: { value: [4.71, 0, 4.7], step: 0.01 },
   });
  */
+
+  const { sunPosition } = useControls("Sun", {
+    sunPosition: { value: [-4.6, 3.2, -7.6], step: 0.1 },
+  });
+
   const {
     presetValues,
     shadowType,
@@ -147,7 +158,7 @@ function Scene(props) {
     stageIntensity,
   } = useControls("Stage", {
     shadowType: { options: ["contact", "accumulative"], value: "contact" },
-    shadowOpacity: { value: 0.2, min: 0, max: 1, step: 0.01 },
+    shadowOpacity: { value: 0.9, min: 0, max: 1, step: 0.01 },
     shadowBlur: { value: 0, min: 0, max: 10, step: 1 },
     environmentType: {
       options: [
@@ -167,7 +178,7 @@ function Scene(props) {
       options: ["portrait", "rembrandt", "upfront", "soft"],
       value: "rembrandt",
     },
-    stageIntensity: { value: 0.09, min: 0, max: 1, step: 0.01 },
+    stageIntensity: { value: 0.0, min: 0, max: 1, step: 0.01 },
     presetValues: { value: [1, 1, 1], step: 0.1 },
   });
 
@@ -200,10 +211,14 @@ function Scene(props) {
     position0: [-14.38, 5.3, 7.7],
   });
 
-  const { dLightPosition, dLightIntensity } = useControls("Directional Light", {
-    dLightPosition: { value: [-7.2, 8.4, 7.1], step: 0.1 },
-    dLightIntensity: { value: 1.0, step: 0.1 },
-  });
+  const { dLightPosition, dLightIntensity, dLightTarget } = useControls(
+    "Directional Light",
+    {
+      dLightPosition: { value: [-4.6, 3.2, -7.6], step: 0.1 },
+      dLightIntensity: { value: 1.0, step: 0.1 },
+      dLightTarget: { value: [0, 0, 0] },
+    }
+  );
 
   /*  const { sunPosition } = useControls("sky", {
     sunPosition: { value: [1, 2, 3] },
@@ -214,7 +229,7 @@ function Scene(props) {
   // --- Model --- //
   const { nodes, animations } = useLoader(
     GLTFLoader,
-    "./model/Maquette_v4.glb"
+    "./model/Maquette_v5.glb"
   );
 
   // --- Textures --- //
@@ -312,7 +327,7 @@ function Scene(props) {
 
   // --- Textures --- //
 
-  // Ref
+  // References
   const eauPiscine = useRef();
   const eauExterieur = useRef();
   const eauPiscineCote = useRef();
@@ -325,7 +340,7 @@ function Scene(props) {
 
   // --- Lights --- //
   const directionalLight = useRef();
-  /*  useHelper(directionalLight, THREE.DirectionalLightHelper, 1); */
+  useHelper(directionalLight, THREE.DirectionalLightHelper, 1);
   // --- Lights --- //
 
   // --- Shader material --- //
@@ -546,7 +561,19 @@ function Scene(props) {
   // --- Render --- //
   return (
     <>
-      <color args={["#241B27"]} attach="background" />
+      {/*  <BakeShadows /> */}
+      <ContactShadows
+        position={[0, -0.0, 0]}
+        opacity={1}
+        scale={15}
+        resolution={512}
+        blur={2}
+        frames={1}
+      />
+
+      {/*  pour flutter les shadows, pour qu'elles ne soyent pas sharp*/}
+      {/*   <SoftShadows size={5} samples={20} focus={0} /> */}
+
       <OrbitControls
         ref={cameraRef}
         /*    enableZoom={orbitControls.enableZoom}
@@ -557,83 +584,93 @@ function Scene(props) {
         maxDistance={orbitControls.maxDistance} */
         target={orbitControls.target}
       />
-
-      <Stage
+      {/*   <Stage
         shadows={{ type: shadowType, opacity: shadowOpacity, blur: shadowBlur }}
         environment={environmentType}
         preset={preset}
         intensity={stageIntensity}
-      >
-        <directionalLight
-          ref={directionalLight}
-          position={[-7.2, 8.4, 7.1]}
-          intensity={dLightIntensity}
-          castShadow
-          shadow-mapSize={[1024, 1024]}
-          shadow-camera-near={1}
-          shadow-camera-far={10}
-          shadow-camera-top={5}
-          shadow-camera-right={5}
-          shadow-camera-bottom={-5}
-          shadow-camera-left={-5}
-        />
+      > */}
+      {/* <directionalLight
+        ref={directionalLight}
+        position={sunPosition}
+        intensity={dLightIntensity}
+        castShadow
+        shadow-mapSize={[1024, 1024]}
+        shadow-camera-near={1}
+        shadow-camera-far={20}
+        shadow-camera-top={10}
+        shadow-camera-right={10}
+        shadow-camera-bottom={-10}
+        shadow-camera-left={-10}
+      /> */}
 
-        {/* Affichage du modèle */}
-        {Object.keys(nodes).map((key) => {
-          // Exclure la scène du rendu et les salissures
-          if (
-            key === "Scene" ||
-            key === "structure_salissure_interieure" ||
-            key === "structure_salissure_exterieure"
-          ) {
-            if (!props.changeTextures) {
-              return null;
-            }
+      {/*  <Sky sunPosition={sunPosition} /> */}
+
+      {/* Affichage du modèle */}
+      {Object.keys(nodes).map((key) => {
+        // Exclure la scène du rendu et les salissures
+        if (key === "Scene") {
+          return null;
+        }
+        if (
+          key === "structure_salissure_interieure" ||
+          key === "structure_salissure_exterieure"
+        ) {
+          if (!props.changeTextures) {
+            return null;
           }
+        }
 
-          // Gérer les cas spéciaux d'eau
-          if (
-            key === "eau_exterieur" ||
-            key === "eau_piscine" ||
-            key === "eau_exterieur_cote" ||
-            key === "eau_piscine_cote"
-          ) {
-            return (
-              <React.Fragment key={key}>
-                <primitive
-                  key={`${key}-firstChild`}
-                  object={nodes[key]}
-                  ref={getRefForKey(key)} // Use the helper function to determine the ref
-                  visible={
-                    key === "eau_piscine" || key === "eau_piscine_cote"
-                      ? true
-                      : showCoteMeshes
-                  }
-                >
-                  <shaderMaterial
-                    attach="material"
-                    ref={
-                      key === "eau_exterieur" || key === "eau_piscine"
-                        ? waterMaterialRef
-                        : waterMaterialSideRef
-                    }
-                    args={
-                      key === "eau_exterieur" || key === "eau_piscine"
-                        ? [data]
-                        : [data2]
-                    }
-                  />
-                </primitive>
-              </React.Fragment>
-            );
-          }
-
-          // Cas par défaut pour les autres nœuds
+        // Gérer les cas spéciaux d'eau
+        if (
+          key === "eau_exterieur" ||
+          key === "eau_piscine" ||
+          key === "eau_exterieur_cote" ||
+          key === "eau_piscine_cote"
+        ) {
           return (
-            <primitive key={key} object={nodes[key]} castShadow receiveShadow />
+            <React.Fragment key={key}>
+              <primitive
+                key={`${key}-firstChild`}
+                object={nodes[key]}
+                ref={getRefForKey(key)} // Use the helper function to determine the ref
+                visible={
+                  key === "eau_piscine" || key === "eau_piscine_cote"
+                    ? true
+                    : showCoteMeshes
+                }
+              >
+                <shaderMaterial
+                  attach="material"
+                  ref={
+                    key === "eau_exterieur" || key === "eau_piscine"
+                      ? waterMaterialRef
+                      : waterMaterialSideRef
+                  }
+                  args={
+                    key === "eau_exterieur" || key === "eau_piscine"
+                      ? [data]
+                      : [data2]
+                  }
+                />
+              </primitive>
+            </React.Fragment>
           );
-        })}
-      </Stage>
+        } else if (
+          key === "salon_sol" ||
+          key === "cuisine_sol" ||
+          key === "sdb_sol" ||
+          key === "exterieur_terrain"
+        ) {
+          return <primitive key={key} object={nodes[key]} receiveShadow />;
+        }
+
+        // Cas par défaut pour les autres nœuds
+        return (
+          <primitive key={key} object={nodes[key]} castShadow receiveShadow />
+        );
+      })}
+      {/*     </Stage> */}
     </>
   );
 }

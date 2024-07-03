@@ -67,7 +67,7 @@ function Home() {
     dLightIntensity: { value: 1, step: 0.1 },
   });
 
-  /* const { sLightPosition, sLightAngle, sLightPenumbra } = useControls(
+  /*   const { sLightPosition, sLightAngle, sLightPenumbra } = useControls(
     "Spot Light",
     {
       sLightPosition: { value: [10, 10, 10], step: 0.1 },
@@ -76,13 +76,18 @@ function Home() {
     }
   ); */
 
-  /*   const { envMapIntensity, envMapHeight, envMapRadius, envMapScale } =
+  const { envMapIntensity, envMapHeight, envMapRadius, envMapScale } =
     useControls("environment map", {
       envMapIntensity: { value: 7, min: 0, max: 12 },
       envMapHeight: { value: 7, min: 0, max: 100 },
       envMapRadius: { value: 28, min: 10, max: 1000 },
       envMapScale: { value: 100, min: 10, max: 1000 },
-    }); */
+    });
+
+  /*   const { sunPosition } = useControls("Sun", {
+    sunPosition: { value: [-4.6, 3.2, -7.6], step: 0.1 },
+  });
+ */
   return (
     <>
       {/* <LoadingBar isLoading={isLoading} progress={progress} /> */}
@@ -103,17 +108,18 @@ function Home() {
               position: [-18.8, 12.06, 9.58],
             }}
           >
+            <color attach="background" args={["#241B27"]} />
             <Perf position="top-left" />
-            {/* <Environment
-                            preset='sunset'
-                            ground={{
-                                height: envMapHeight,
-                                radius: envMapRadius,
-                                scale: envMapScale,
-                            }}
-                            intensity={0.5}
-                        /> */}
-            {/* <ambientLight intensity={0.5} /> */}
+            <Environment
+              preset="sunset"
+              /*     ground={{
+                height: envMapHeight,
+                radius: envMapRadius,
+                scale: envMapScale,
+              }} */
+              intensity={0.8}
+            />
+            {/*   <ambientLight intensity={0.5} /> */}
 
             {/* <directionalLight
                             position={dLightPosition}
@@ -122,7 +128,7 @@ function Home() {
                             castShadow
                         />
                         <directionalLightHelper light={dirLight} /> */}
-            {/*  <spotLight
+            {/*   <spotLight
               position={sLightPosition}
               angle={sLightAngle}
               penumbra={sLightPenumbra}
@@ -139,12 +145,11 @@ function Home() {
                 isReset={isReset}
               />
             </Suspense> */}
-            {/* <Sky
-                            distance={450000}
-                            sunPosition={[0, 1, 0]}
-                            inclination={0}
-                            azimuth={0.25}
-                        /> */}
+            {/*  <Sky
+            
+              sunPosition={sunPosition}
+              
+            /> */}
 
             <Scene
               isScenarioChanged={isScenarioChanged}
