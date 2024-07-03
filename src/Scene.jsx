@@ -215,7 +215,7 @@ function Scene(props) {
     "Directional Light",
     {
       dLightPosition: { value: [-4.6, 3.2, -7.6], step: 0.1 },
-      dLightIntensity: { value: 1.0, step: 0.1 },
+      dLightIntensity: { value: 0.1, step: 0.1 },
       dLightTarget: { value: [0, 0, 0] },
     }
   );
@@ -340,7 +340,7 @@ function Scene(props) {
 
   // --- Lights --- //
   const directionalLight = useRef();
-  useHelper(directionalLight, THREE.DirectionalLightHelper, 1);
+  /*   useHelper(directionalLight, THREE.DirectionalLightHelper, 1); */
   // --- Lights --- //
 
   // --- Shader material --- //
@@ -602,6 +602,7 @@ function Scene(props) {
         shadow-camera-right={10}
         shadow-camera-bottom={-10}
         shadow-camera-left={-10}
+        color={0xffd0b5}
       />
 
       {/*  <Sky sunPosition={sunPosition} /> */}
