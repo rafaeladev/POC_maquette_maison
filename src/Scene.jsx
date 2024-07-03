@@ -145,7 +145,7 @@ function Scene(props) {
  */
 
   const { sunPosition } = useControls("Sun", {
-    sunPosition: { value: [-4.6, 3.2, -7.6], step: 0.1 },
+    sunPosition: { value: [-3.9, 9.9, 10.1], step: 0.1 },
   });
 
   const {
@@ -562,14 +562,14 @@ function Scene(props) {
   return (
     <>
       {/*  <BakeShadows /> */}
-      <ContactShadows
+      {/*  <ContactShadows
         position={[0, -0.0, 0]}
         opacity={1}
         scale={15}
         resolution={512}
         blur={2}
         frames={1}
-      />
+      /> */}
 
       {/*  pour flutter les shadows, pour qu'elles ne soyent pas sharp*/}
       {/*   <SoftShadows size={5} samples={20} focus={0} /> */}
@@ -590,7 +590,7 @@ function Scene(props) {
         preset={preset}
         intensity={stageIntensity}
       > */}
-      {/* <directionalLight
+      <directionalLight
         ref={directionalLight}
         position={sunPosition}
         intensity={dLightIntensity}
@@ -602,7 +602,7 @@ function Scene(props) {
         shadow-camera-right={10}
         shadow-camera-bottom={-10}
         shadow-camera-left={-10}
-      /> */}
+      />
 
       {/*  <Sky sunPosition={sunPosition} /> */}
 
