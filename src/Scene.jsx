@@ -15,6 +15,7 @@ import {
   BakeShadows,
   ContactShadows,
   SoftShadows,
+  PresentationControls,
 } from "@react-three/drei";
 
 // imports React Three Fiber
@@ -50,7 +51,8 @@ const applyMaterial = (node, loadedTextures, name) => {
   if (
     name === "plastique_blanc" ||
     name === "Plastique_noir" ||
-    name === "plante"
+    name === "plante" ||
+    name === "Cuir"
   ) {
     materialOptions = {
       color:
@@ -58,7 +60,9 @@ const applyMaterial = (node, loadedTextures, name) => {
           ? 0xffffff
           : name === "Plastique_noir"
           ? 0x000000
-          : 0x6e7d65,
+          : name === "plante"
+          ? 0x6e7d65
+          : 0x3b2517,
       name: name,
     };
   } else {
@@ -189,7 +193,6 @@ function Scene(props) {
     enableZoom: true,
     enableRotate: true,
     enablePan: true,
-
     enableKeys: true,
     enableZoomSpeed: 1,
     enableRotateSpeed: 1,
@@ -198,17 +201,17 @@ function Scene(props) {
     rotateSpeed: 1,
     panSpeed: 1,
     minPolarAngle: 0,
-    maxPolarAngle: Math.PI,
+    maxPolarAngle: (80 * Math.PI) / 180,
     minAzimuthAngle: -Infinity,
     maxAzimuthAngle: Infinity,
-    /*   minDistance: -10,
-    maxDistance: 5, */
+    minDistance: -10,
+    maxDistance: 17,
     damping: 0.25,
     screenSpacePanning: true,
     keyPanSpeed: 7,
     dynamicDampingFactor: 0.2,
     target: [0, 0, 0],
-    position0: [-14.38, 5.3, 7.7],
+    /*  position0: props.cameraPosition, */
   });
 
   const { dLightPosition, dLightIntensity, dLightTarget } = useControls(
@@ -217,6 +220,15 @@ function Scene(props) {
       dLightPosition: { value: [-4.6, 3.2, -7.6], step: 0.1 },
       dLightIntensity: { value: 0.1, step: 0.1 },
       dLightTarget: { value: [0, 0, 0] },
+    }
+  );
+
+  const { cameraTargetX, cameraTargetY, cameraTargetZ } = useControls(
+    "Camera Target",
+    {
+      cameraTargetX: { value: 0, step: 0.5 },
+      cameraTargetY: { value: 0, step: 0.5 },
+      cameraTargetZ: { value: 0, step: 0.5 },
     }
   );
 
@@ -273,7 +285,8 @@ function Scene(props) {
         } else if (
           targetMaterialName === "plastique_blanc" ||
           targetMaterialName === "Plastique_noir" ||
-          targetMaterialName === "plante"
+          targetMaterialName === "plante" ||
+          targetMaterialName === "Cuir"
         ) {
           applyMaterial(node, null, targetMaterialName);
         }
@@ -425,12 +438,42 @@ function Scene(props) {
   /* const cameraPosition = new THREE.Vector3((5, 2, -2));
   const cameraTarget = new THREE.Vector3((10, 5, 0)); */
 
-  /*   const { camera } = useThree();
-  useFrame((state) => {
+  const { camera } = useThree();
+  useFrame(({ camera }) => {
     // Update camera position based on Leva controls
-    camera.position.set(cameraX, cameraY, cameraZ);
+
+    /*   console.log(camera.position); */
+    console.log(camera.rotation);
+    console.log(cameraRef.current);
+    /*  camera.position.set(
+      props.newCameraPosition.x,
+      props.newCameraPosition.y,
+      props.newCameraPosition.z
+    ); */
+
     camera.updateProjectionMatrix();
-  }); */
+  });
+
+  useEffect(() => {
+    camera.position.set(
+      props.newCameraPosition.x,
+      props.newCameraPosition.y,
+      props.newCameraPosition.z
+    );
+
+    const euler = new THREE.Euler(
+      props.newCameraLookAt.x,
+      props.newCameraLookAt.y,
+      props.newCameraLookAt.z,
+      "XYZ"
+    );
+
+    camera.rotation.set(euler);
+
+    /* cameraRef.current.target.set(18, -1, 0); */
+    /* cameraRef.current.lookAt(orbitControls.target); */
+    /*    } */
+  }, [props.newCameraPosition]);
   // --- Camera --- //
 
   // --- Animation de l'eau --- //
@@ -450,6 +493,8 @@ function Scene(props) {
       eauPiscineCote.current.material.uniforms.uTime.value =
         clock.getElapsedTime();
     }
+    /*  console.log(camera.position); */
+
     /*   if (cameraRef.current) {
       camera.position.copy(cameraRef.current.position0);
       camera.lookAt(cameraRef.current.target);
@@ -576,20 +621,14 @@ function Scene(props) {
 
       <OrbitControls
         ref={cameraRef}
-        /*    enableZoom={orbitControls.enableZoom}
-        enableRotate={orbitControls.enableRotate}
-        autoRotate={orbitControls.autoRotate}
-        autoRotateSpeed={orbitControls.autoRotateSpeed}
-        minDistance={orbitControls.minDistance}
-        maxDistance={orbitControls.maxDistance} */
         target={orbitControls.target}
+        minPolarAngle={orbitControls.minPolarAngle}
+        maxPolarAngle={orbitControls.maxPolarAngle}
+        minAzimuthAngle={orbitControls.minAzimuthAngle}
+        maxAzimuthAngle={orbitControls.maxAzimuthAngle}
+        maxDistance={orbitControls.maxDistance}
       />
-      {/*   <Stage
-        shadows={{ type: shadowType, opacity: shadowOpacity, blur: shadowBlur }}
-        environment={environmentType}
-        preset={preset}
-        intensity={stageIntensity}
-      > */}
+
       <directionalLight
         ref={directionalLight}
         position={sunPosition}
@@ -671,7 +710,6 @@ function Scene(props) {
           <primitive key={key} object={nodes[key]} castShadow receiveShadow />
         );
       })}
-      {/*     </Stage> */}
     </>
   );
 }

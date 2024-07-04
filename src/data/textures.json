@@ -70,7 +70,7 @@
       "normalMap": "./textures/herbe/herbe_normal.png",
       "roughnessMap": "./textures/herbe_sale/herbe_sale_diffuse.png"
     },
-    "cuir_sale": {
+    "Cuir_sale": {
       "colorMap": "./textures/cuir_sale/cuir_sale_diffuse.png",
       "roughnessMap": "./textures/cuir_sale/cuir_sale_rough.png"
     },

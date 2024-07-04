@@ -22,6 +22,13 @@ function Home() {
   const [isWaterMovingUp, setIsWaterMovingUp] = useState(false);
   const [isReset, setIsReset] = useState(false);
   const [resetKey, setResetKey] = useState(0);
+  const [newCameraPosition, setNewCameraPosition] = useState({
+    x: -12.08,
+    y: 5.28,
+    z: 9.7,
+  });
+
+  const [newCameraLookAt, setNewCameraLookAt] = useState({ x: 0, y: 0, z: 0 });
 
   const [changeTextures, setChangeTextures] = useState(false);
   const [resetTextures, setResetTextures] = useState(false);
@@ -44,6 +51,22 @@ function Home() {
 
   const toggleTextures = () => {
     setChangeTextures((prev) => !prev);
+  };
+
+  const handleCameraPosition = (location) => {
+    if (location === "cuisine") {
+      setNewCameraPosition({ x: 6.45, y: 1.77, z: 4.52 });
+      setNewCameraLookAt({ x: -0.18, y: 0.23, z: 0.04 });
+    } else if (location === "salon") {
+      setNewCameraPosition({ x: -0.88, y: 1.23, z: 1.25 });
+      setNewCameraLookAt({ x: 0, y: 0, z: 0 });
+    } else if (location === "sdb") {
+      setNewCameraPosition({ x: 5.099, y: 1.281, z: -7.843 });
+      setNewCameraLookAt({ x: 0, y: 0, z: 0 });
+    } else if (location === "jardin") {
+      setNewCameraPosition({ x: -7.12, y: 3.64, z: 9.33 });
+      setNewCameraLookAt({ x: 0, y: 0, z: 0 });
+    }
   };
 
   const handleReset = () => {
@@ -88,6 +111,7 @@ function Home() {
     sunPosition: { value: [-4.6, 3.2, -7.6], step: 0.1 },
   });
  */
+
   return (
     <>
       {/* <LoadingBar isLoading={isLoading} progress={progress} /> */}
@@ -105,20 +129,12 @@ function Home() {
               fov: 45,
               near: 0.1,
               far: 200,
-              position: [-18.8, 12.06, 9.58],
+              position: [-12.08, 5.28, 9.7],
             }}
           >
             <color attach="background" args={["#241B27"]} />
             <Perf position="top-left" />
-            <Environment
-              preset="sunset"
-              /*     ground={{
-                height: envMapHeight,
-                radius: envMapRadius,
-                scale: envMapScale,
-              }} */
-              intensity={0.8}
-            />
+            <Environment preset="sunset" intensity={envMapIntensity} />
             {/*   <ambientLight intensity={0.5} /> */}
 
             {/* <directionalLight
@@ -163,6 +179,8 @@ function Home() {
               resetTextures={resetTextures}
               changeTextures={changeTextures}
               toggleTextures={toggleTextures}
+              newCameraPosition={newCameraPosition}
+              newCameraLookAt={newCameraLookAt}
             />
           </Canvas>
         </div>
@@ -175,6 +193,7 @@ function Home() {
           handleReset={handleReset}
           isReset={isReset}
           toggleReset={toggleReset}
+          handleCameraPosition={handleCameraPosition}
         />
       </Suspense>
 
