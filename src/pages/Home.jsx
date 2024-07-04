@@ -58,10 +58,10 @@ function Home() {
       setNewCameraPosition({ x: 6.45, y: 1.77, z: 4.52 });
       setNewCameraLookAt({ x: -0.18, y: 0.23, z: 0.04 });
     } else if (location === "salon") {
-      setNewCameraPosition({ x: -0.88, y: 1.23, z: 1.25 });
-      setNewCameraLookAt({ x: 0, y: 0, z: 0 });
+      setNewCameraPosition({ x: -0.88, y: 1, z: 1.25 });
+      setNewCameraLookAt({ x: 0, y: -0.5, z: 0 });
     } else if (location === "sdb") {
-      setNewCameraPosition({ x: 5.099, y: 1.281, z: -7.843 });
+      setNewCameraPosition({ x: 7, y: 1.281, z: -7.843 });
       setNewCameraLookAt({ x: 0, y: 0, z: 0 });
     } else if (location === "jardin") {
       setNewCameraPosition({ x: -7.12, y: 3.64, z: 9.33 });
