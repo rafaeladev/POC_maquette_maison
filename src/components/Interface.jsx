@@ -26,6 +26,8 @@ function Interface(props) {
         buttonsClicked.sdb &&
         buttonsClicked.jardin;
 
+    console.log(props.isReset);
+
     return (
         <div className='scenario_list'>
             <div
