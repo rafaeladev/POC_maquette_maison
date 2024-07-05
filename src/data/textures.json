@@ -1,110 +1,129 @@
 {
-  "materials": {
-    "asphalt": {
-      "colorMap": "./textures/goudron/goudron_diffuse.png",
-      "normalMap": "./textures/goudron/goudron_normal.png",
-      "roughnessMap": "./textures/goudron/goudron_rough.png"
-    },
-    "asphalt_sale": {
-      "colorMap": "./textures/goudron_sale/goudron_sale_diffuse.png",
-      "normalMap": "./textures/goudron/goudron_normal.png",
-      "roughnessMap": "./textures/goudron_sale/goudron_sale_rough.png"
-    },
-    "carpet": {
-      "colorMap": "./textures/tapis/tapis_diffuse.jpg",
-      "normalMap": "./textures/tapis/tapis_normal.png",
-      "roughnessMap": "./textures/tapis/tapis_rough.jpg"
-    },
-    "carpet_sale": {
-      "colorMap": "./textures/tapis_sale/tapis_sale_diffuse.png",
-      "normalMap": "./textures/tapis/tapis_normal.png",
-      "roughnessMap": "./textures/tapis_sale/tapis_sale_rough.png"
-    },
-    "beton": {
-      "colorMap": "./textures/beton/beton_diffuse.png",
-      "normalMap": "./textures/beton/beton_normal.png",
-      "roughnessMap": "./textures/beton/beton_rough.png"
-    },
-    "beton_sale": {
-      "colorMap": "./textures/beton_sale/beton_sale_diffuse.png",
-      "normalMap": "./textures/beton/beton_normal.png",
-      "roughnessMap": "./textures/beton_sale/beton_sale_rough.png"
-    },
-    "sol_sdb": {
-      "colorMap": "./textures/sol_sdb/sol_sdb_diffuse.png",
-      "normalMap": "./textures/sol_sdb/sol_sdb_normal.png",
-      "roughnessMap": "./textures/sol_sdb/sol_sdb_rough.png"
-    },
-    "sol_sdb_sale": {
-      "colorMap": "./textures/sol_sdb_sale/sol_sdb_sale_diffuse.png",
-      "normalMap": "./textures/sol_sdb/sol_sdb_normal.png",
-      "roughnessMap": "./textures/sol_sdb_sale/sol_sdb_sale_rough.png"
-    },
-    "cuisine_sol": {
-      "colorMap": "./textures/sol_cuisine/sol_cuisine_diffuse.png",
-      "normalMap": "./textures/sol_cuisine/sol_cuisine_normal.png",
-      "roughnessMap": "./textures/sol_cuisine/sol_cuisine_rough.png"
-    },
-    "cuisine_sol_sale": {
-      "colorMap": "./textures/sol_cuisine_sale/sol_cuisine_sale_diffuse.png",
-      "normalMap": "./textures/sol_cuisine/sol_cuisine_normal.png",
-      "roughnessMap": "./textures/sol_cuisine_sale/sol_cuisine_sale_rough.png"
-    },
-    "sol_salon": {
-      "colorMap": "./textures/sol_salon/sol_salon_diffuse.png",
-      "normalMap": "./textures/sol_salon/sol_salon_normal.png",
-      "roughnessMap": "./textures/sol_salon/sol_salon_rough.png"
-    },
-    "sol_salon_sale": {
-      "colorMap": "./textures/sol_salon_sale/sol_salon_sale_diffuse.png",
-      "normalMap": "./textures/sol_salon_sale/sol_salon_sale_normal.png",
-      "roughnessMap": "./textures/sol_salon_sale/sol_salon_sale_rough.png"
-    },
-    "herbe": {
-      "colorMap": "./textures/herbe/herbe_diffuse.png",
-      "normalMap": "./textures/herbe/herbe_normal.png",
-      "roughnessMap": "./textures/herbe/herbe_rough.png"
-    },
-    "herbe_sale": {
-      "colorMap": "./textures/herbe_sale/herbe_sale_diffuse.png",
-      "normalMap": "./textures/herbe/herbe_normal.png",
-      "roughnessMap": "./textures/herbe_sale/herbe_sale_diffuse.png"
-    },
-    "Cuir_sale": {
-      "colorMap": "./textures/cuir_sale/cuir_sale_diffuse.png",
-      "roughnessMap": "./textures/cuir_sale/cuir_sale_rough.png"
-    },
-    "Plastique_noir_sale": {
-      "colorMap": "./textures/Plastique_noir_sale/plastique_noir_sale_diffuse.png",
-      "roughnessMap": "./textures/Plastique_noir_sale/plastique_noir_sale_rough.png"
-    },
-    "plastique_blanc_sale": {
-      "colorMap": "./textures/plastique_blanc_sale/plastique_blanc_sale_diffuse.png",
-      "roughnessMap": "./textures/plastique_blanc_sale/plastique_blanc_sale_rough.png"
-    },
-    "Toit": {
-      "colorMap": "./textures/toit/toit_color.png",
-      "normalMap": "./textures/toit/toit_normal.png",
-      "roughnessMap": "./textures/toit/toit_rough.png"
-    },
-    "plante_sale": {
-      "colorMap": "./textures/plante_sale/plante_sale_diffuse.png",
-      "roughnessMap": "./textures/plante_sale/plante_sale_rough.png"
-    },
-    "Mur_exterieur": {
-      "colorMap": "./textures/mur_exterieur/mur_exterieur_diffuse.png",
-      "normalMap": "./textures/mur_exterieur/mur_exterieur_normal.png",
-      "roughnessMap": "./textures/mur_exterieur/mur_exterieur_rough.png"
-    },
-    "bois": {
-      "colorMap": "./textures/bois/bois_diffuse.png",
-      "normalMap": "./textures/bois/bois_normal.png",
-      "roughnessMap": "./textures/bois/bois_rough.png"
-    },
-    "bois_sale": {
-      "colorMap": "./textures/bois_sale/bois_sale_diffuse.png",
-      "normalMap": "./textures/bois_sale/bois_sale_normal.png",
-      "roughnessMap": "./textures/bois_sale/bois_sale_rough.png"
+    "materials": {
+        "asphalt": {
+            "colorMap": "./textures/goudron/goudron_diffuse.png",
+            "normalMap": "./textures/goudron/goudron_normal.png",
+            "roughnessMap": "./textures/goudron/goudron_rough.png"
+        },
+        "asphalt_sale": {
+            "colorMap": "./textures/goudron_sale/goudron_sale_diffuse.png",
+            "normalMap": "./textures/goudron/goudron_normal.png",
+            "roughnessMap": "./textures/goudron_sale/goudron_sale_rough.png"
+        },
+        "carpet": {
+            "colorMap": "./textures/tapis/tapis_diffuse.jpg",
+            "normalMap": "./textures/tapis/tapis_normal.png",
+            "roughnessMap": "./textures/tapis/tapis_rough.jpg"
+        },
+        "carpet_sale": {
+            "colorMap": "./textures/tapis_sale/tapis_sale_diffuse.png",
+            "normalMap": "./textures/tapis/tapis_normal.png",
+            "roughnessMap": "./textures/tapis_sale/tapis_sale_rough.png"
+        },
+        "beton": {
+            "colorMap": "./textures/beton/beton_diffuse.png",
+            "normalMap": "./textures/beton/beton_normal.png",
+            "roughnessMap": "./textures/beton/beton_rough.png"
+        },
+        "beton_sale": {
+            "colorMap": "./textures/beton_sale/beton_sale_diffuse.png",
+            "normalMap": "./textures/beton/beton_normal.png",
+            "roughnessMap": "./textures/beton_sale/beton_sale_rough.png"
+        },
+        "sol_sdb": {
+            "colorMap": "./textures/sol_sdb/sol_sdb_diffuse.png",
+            "normalMap": "./textures/sol_sdb/sol_sdb_normal.png",
+            "roughnessMap": "./textures/sol_sdb/sol_sdb_rough.png"
+        },
+        "sol_sdb_sale": {
+            "colorMap": "./textures/sol_sdb_sale/sol_sdb_sale_diffuse.png",
+            "normalMap": "./textures/sol_sdb/sol_sdb_normal.png",
+            "roughnessMap": "./textures/sol_sdb_sale/sol_sdb_sale_rough.png"
+        },
+        "cuisine_sol": {
+            "colorMap": "./textures/sol_cuisine/sol_cuisine_diffuse.png",
+            "normalMap": "./textures/sol_cuisine/sol_cuisine_normal.png",
+            "roughnessMap": "./textures/sol_cuisine/sol_cuisine_rough.png"
+        },
+        "cuisine_sol_sale": {
+            "colorMap": "./textures/sol_cuisine_sale/sol_cuisine_sale_diffuse.png",
+            "normalMap": "./textures/sol_cuisine/sol_cuisine_normal.png",
+            "roughnessMap": "./textures/sol_cuisine_sale/sol_cuisine_sale_rough.png"
+        },
+        "sol_salon": {
+            "colorMap": "./textures/sol_salon/sol_salon_diffuse.png",
+            "normalMap": "./textures/sol_salon/sol_salon_normal.png",
+            "roughnessMap": "./textures/sol_salon/sol_salon_rough.png"
+        },
+        "sol_salon_sale": {
+            "colorMap": "./textures/sol_salon_sale/sol_salon_sale_diffuse.png",
+            "normalMap": "./textures/sol_salon_sale/sol_salon_sale_normal.png",
+            "roughnessMap": "./textures/sol_salon_sale/sol_salon_sale_rough.png"
+        },
+        "herbe": {
+            "colorMap": "./textures/herbe/herbe_diffuse.png",
+            "normalMap": "./textures/herbe/herbe_normal.png",
+            "roughnessMap": "./textures/herbe/herbe_rough.png"
+        },
+        "herbe_sale": {
+            "colorMap": "./textures/herbe_sale/herbe_sale_diffuse.png",
+            "normalMap": "./textures/herbe/herbe_normal.png",
+            "roughnessMap": "./textures/herbe_sale/herbe_sale_diffuse.png"
+        },
+        "Cuir_sale": {
+            "colorMap": "./textures/Cuir_sale/cuir_sale_diffuse.png",
+            "roughnessMap": "./textures/Cuir_sale/cuir_sale_rough.png"
+        },
+        "Plastique_noir_sale": {
+            "colorMap": "./textures/Plastique_noir_sale/plastique_noir_sale_diffuse.png",
+            "roughnessMap": "./textures/Plastique_noir_sale/plastique_noir_sale_rough.png"
+        },
+        "plastique_blanc_sale": {
+            "colorMap": "./textures/plastique_blanc_sale/plastique_blanc_sale_diffuse.png",
+            "roughnessMap": "./textures/plastique_blanc_sale/plastique_blanc_sale_rough.png"
+        },
+        "Toit": {
+            "colorMap": "./textures/toit/toit_color.png",
+            "normalMap": "./textures/toit/toit_normal.png",
+            "roughnessMap": "./textures/toit/toit_rough.png"
+        },
+        "plante_sale": {
+            "colorMap": "./textures/plante_sale/plante_sale_diffuse.png",
+            "roughnessMap": "./textures/plante_sale/plante_sale_rough.png"
+        },
+        "Mur_exterieur": {
+            "colorMap": "./textures/mur_exterieur/mur_exterieur_diffuse.png",
+            "normalMap": "./textures/mur_exterieur/mur_exterieur_normal.png",
+            "roughnessMap": "./textures/mur_exterieur/mur_exterieur_rough.png"
+        },
+        "bois": {
+            "colorMap": "./textures/bois/bois_diffuse.png",
+            "normalMap": "./textures/bois/bois_normal.png",
+            "roughnessMap": "./textures/bois/bois_rough.png"
+        },
+        "bois_sale": {
+            "colorMap": "./textures/bois_sale/bois_sale_diffuse.png",
+            "normalMap": "./textures/bois_sale/bois_sale_normal.png",
+            "roughnessMap": "./textures/bois_sale/bois_sale_rough.png"
+        },
+        "produits_menagers": {
+            "colorMap": "./textures/produits_menagers/household_chemicals_diffuse.png"
+        },
+        "craquellure_mur": {
+            "colorMap": "./textures/mur_craquellure/wall_crack_diffuse_and_opacity.png"
+        },
+        "flaque_eau": {
+            "alphaMap": "./textures/flaque_eau/puddle_opacity.png",
+            "normalMap": "./textures/flaque_eau/puddle_normal.png"
+        },
+        "flaque_fioul": {
+            "alphaMap": "./textures/flaque_fioul/puddle_opacity.png",
+            "normalMap": "./textures/flaque_fioul/puddle_normal.png"
+        },
+        "metal_sale": {
+            "colorMap": "./textures/metal_sale/metal_dirty_diffuse.png",
+            "metalnessMap": "./textures/metal_sale/metal_dirty_metalness.png",
+            "roughnessMap": "./textures/metal_sale/metal_dirty_rough.png"
+        }
     }
-  }
 }
