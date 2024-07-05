@@ -24,6 +24,7 @@ import { useFrame, useLoader, useThree } from '@react-three/fiber';
 // imports Three.js
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
+import { Vector3 } from 'three';
 
 // imports des shaders
 import waterVertexShader from './shaders/water/vertex.glsl';
@@ -43,11 +44,13 @@ import { TextureLoader } from 'three';
 
 // Approche  n°2 avec Water from three-stdlib
 import Ocean from './Ocean.jsx';
+import { or } from 'three/examples/jsm/nodes/Nodes.js';
 
 // Fonction pour appliquer les textures aux objets
 const applyMaterial = (node, loadedTextures, name) => {
     let materialOptions;
 
+    // console.log(name);
     if (
         name === 'plastique_blanc' ||
         name === 'Plastique_noir' ||
@@ -76,8 +79,6 @@ const applyMaterial = (node, loadedTextures, name) => {
         };
     }
 
-    console.log(materialOptions.alphaMap);
-
     if (materialOptions.normalMap) {
         materialOptions.normalMap.wrapS = THREE.RepeatWrapping;
         materialOptions.normalMap.wrapT = THREE.RepeatWrapping;
@@ -98,10 +99,10 @@ const applyMaterial = (node, loadedTextures, name) => {
         materialOptions.metalnessMap.wrapT = THREE.RepeatWrapping;
     }
 
-    if (materialOptions.alphaMap) {
-        materialOptions.alphaMap.wrapS = THREE.RepeatWrapping;
-        materialOptions.alphaMap.wrapT = THREE.RepeatWrapping;
-    }
+    // if (materialOptions.alphaMap) {
+    //     materialOptions.alphaMap.wrapS = THREE.RepeatWrapping;
+    //     materialOptions.alphaMap.wrapT = THREE.RepeatWrapping;
+    // }
 
     node.material = new THREE.MeshStandardMaterial(materialOptions);
     node.material.needsUpdate = true;
@@ -243,10 +244,56 @@ function Scene(props) {
     // --- Model --- //
     const { nodes, animations } = useLoader(GLTFLoader, './model/Maquette_v6.glb');
 
+    const [damagedNodes, setDamagedNodes] = useState({});
+    const [cleanNodes, setCleanNodes] = useState({});
+
+    useEffect(() => {
+        // Créer des objets pour stocker les objets abîmés et propres
+        const damaged = {};
+        const clean = {};
+        Object.keys(nodes).forEach((key) => {
+            if (key.includes('_abime')) {
+                damaged[key] = nodes[key];
+            } else {
+                clean[key] = nodes[key];
+            }
+        });
+        setDamagedNodes(damaged);
+        setCleanNodes(clean);
+    }, [nodes]);
+
+    // console.log('Damaged:', damagedNodes);
+    // console.log('Clean:', cleanNodes);
+    const shouldShowNode = (key) => {
+        if (props.isReset) {
+            // Montrer les objets propres et cacher les abîmés en cas de reset
+            return !key.includes('_abime');
+        } else if (props.isScenarioChanged) {
+            // Montrer les objets abîmés et cacher les doublons propres
+            if (key.includes('_abime')) {
+                return true;
+            }
+
+            // Trouver la version abîmée de la clé
+            const baseKey = `${key}_abime`;
+            if (damagedNodes[baseKey]) {
+                if (nodes[key] && nodes[key].isGroup) {
+                    // Supprimez les enfants du groupe
+                    nodes[key].traverse((child) => {
+                        if (child !== nodes[key]) {
+                            child.visible = false;
+                        }
+                    });
+                }
+                return false;
+            }
+        }
+        // Par défaut, montrer les objets propres et cacher les abîmés
+        return !key.includes('_abime');
+    };
+
     // --- Textures --- //
     const [texturesLoaded, setTexturesLoaded] = useState(false);
-
-    const [originalTextures, setOriginalTextures] = useState({});
 
     // Fonction pour charger les textures
     const handleTextureLoading = async (nodes, textureAction) => {
@@ -267,13 +314,7 @@ function Scene(props) {
                     try {
                         const loadedTextures = await loadTextures(targetMaterialName);
 
-                        if (textureAction === 'load') {
-                            // Save original textures
-                            setOriginalTextures((prev) => ({
-                                ...prev,
-                                [materialName]: loadedTextures,
-                            }));
-                        } else {
+                        if (textureAction === 'reset' || textureAction === 'change') {
                             applyMaterial(node, loadedTextures, targetMaterialName);
                         }
                     } catch (error) {
@@ -282,6 +323,15 @@ function Scene(props) {
                             error
                         );
                     }
+                } else if (
+                    materialName &&
+                    (targetMaterialName === 'plastique_blanc' ||
+                        targetMaterialName === 'Plastique_noir' ||
+                        targetMaterialName === 'plante' ||
+                        targetMaterialName === 'Cuir') &&
+                    textureAction === 'reset'
+                ) {
+                    applyMaterial(node, null, targetMaterialName);
                 }
             }
         });
@@ -327,7 +377,7 @@ function Scene(props) {
                 waterMaterialSideRef.current.uniforms.uSurfaceColor.value.set('#c1def5');
             }
         }
-    }, [props.resetTextures, originalTextures, nodes]);
+    }, [props.resetTextures, nodes]);
 
     // --- Textures --- //
 
@@ -426,14 +476,15 @@ function Scene(props) {
     // --- Shader material --- //
 
     // --- Camera --- //
-    /* const cameraPosition = new THREE.Vector3((5, 2, -2));
-  const cameraTarget = new THREE.Vector3((10, 5, 0)); */
+    const cameraPosition = new THREE.Vector3();
+    // const cameraTarget = new THREE.Vector3();
 
     const { camera } = useThree();
     useFrame(({ camera }) => {
         // Update camera position based on Leva controls
-
-        /*   console.log(camera.position); */
+        // console.log(props.cameraPosition);
+        // console.log(camera.position);
+        // console.log(props.cameraLookAt);
         // console.log(camera.rotation);
         // console.log(cameraRef.current);
         /*  camera.position.set(
@@ -441,30 +492,15 @@ function Scene(props) {
       props.newCameraPosition.y,
       props.newCameraPosition.z
     ); */
-
-        camera.updateProjectionMatrix();
+        // camera.updateProjectionMatrix();
+        // console.log(camera.position);
+        // console.log(camera);
     });
 
     useEffect(() => {
-        camera.position.set(
-            props.newCameraPosition.x,
-            props.newCameraPosition.y,
-            props.newCameraPosition.z
-        );
-
-        const euler = new THREE.Euler(
-            props.newCameraLookAt.x,
-            props.newCameraLookAt.y,
-            props.newCameraLookAt.z,
-            'XYZ'
-        );
-
-        camera.rotation.set(euler);
-
-        /* cameraRef.current.target.set(18, -1, 0); */
-        /* cameraRef.current.lookAt(orbitControls.target); */
-        /*    } */
-    }, [props.newCameraPosition]);
+        camera.position.copy(props.cameraPosition);
+        camera.lookAt(props.cameraTarget);
+    }, [camera, props.cameraPosition, props.cameraTarget]);
     // --- Camera --- //
 
     // --- Animation de l'eau --- //
@@ -550,7 +586,7 @@ function Scene(props) {
             timeoutId = window.setTimeout(() => {
                 props.toggleAnimation();
                 setShowCoteMeshes(false);
-                props.toggleReset();
+                // props.toggleReset();
                 /*   props.toggleTextures(); */
             }, 5000);
         }
@@ -605,7 +641,8 @@ function Scene(props) {
 
             <OrbitControls
                 ref={cameraRef}
-                target={orbitControls.target}
+                // target={orbitControls.target}
+                target={props.cameraTarget}
                 minPolarAngle={orbitControls.minPolarAngle}
                 maxPolarAngle={orbitControls.maxPolarAngle}
                 minAzimuthAngle={orbitControls.minAzimuthAngle}
@@ -634,6 +671,10 @@ function Scene(props) {
             {Object.keys(nodes).map((key) => {
                 // Exclure la scène du rendu et les salissures
                 if (key === 'Scene') {
+                    return null;
+                }
+                // Utiliser shouldShowNode pour déterminer si le nœud doit être affiché
+                if (!shouldShowNode(key)) {
                     return null;
                 }
                 if (
