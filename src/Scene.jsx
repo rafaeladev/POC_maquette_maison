@@ -242,7 +242,7 @@ function Scene(props) {
     // ---  Debug controls --- //
 
     // --- Model --- //
-    const { nodes, animations } = useLoader(GLTFLoader, './model/Maquette_v6.glb');
+    const { nodes, animations } = useLoader(GLTFLoader, './model/Maquette_v7.glb');
 
     const [damagedNodes, setDamagedNodes] = useState({});
     const [cleanNodes, setCleanNodes] = useState({});
@@ -262,8 +262,8 @@ function Scene(props) {
         setCleanNodes(clean);
     }, [nodes]);
 
-    // console.log('Damaged:', damagedNodes);
-    // console.log('Clean:', cleanNodes);
+    console.log('Damaged:', damagedNodes);
+    console.log('Clean:', cleanNodes);
     const shouldShowNode = (key) => {
         if (props.isReset) {
             // Montrer les objets propres et cacher les abîmés en cas de reset
@@ -276,19 +276,33 @@ function Scene(props) {
 
             // Trouver la version abîmée de la clé
             const baseKey = `${key}_abime`;
+
             if (damagedNodes[baseKey]) {
                 if (nodes[key] && nodes[key].isGroup) {
-                    // Supprimez les enfants du groupe
-                    nodes[key].traverse((child) => {
-                        if (child !== nodes[key]) {
-                            child.visible = false;
-                        }
-                    });
+                    console.log(damagedNodes[`${baseKey}_1`]);
+                    if (damagedNodes[`_1_${baseKey}`]) {
+                        return false;
+                    }
+
+                    // for (let i = 3; i < 4; i++) {
+                    //     console.log(`${key}_${i}`);
+                    //     if (cleanNodes[`${key}_${i}`]) {
+                    //         return false;
+                    //     }
+                    // }
+                    // console.log(nodes[key]);
+                    // // Supprimez les enfants du groupe
+                    // nodes[key].traverse((child) => {
+                    //     if (child !== nodes[key]) {
+                    //         child.visible = false;
+                    //     }
+                    // });
                 }
                 return false;
             }
         }
-        // Par défaut, montrer les objets propres et cacher les abîmés
+        // console.log(key);
+        // console.log(!key.includes('_abime')); // Par défaut, montrer les objets propres et cacher les abîmés
         return !key.includes('_abime');
     };
 
@@ -679,10 +693,19 @@ function Scene(props) {
                 }
                 if (
                     key === 'structure_salissure_interieure' ||
-                    key === 'structure_salissure_exterieure'
+                    key === 'structure_salissure_exterieure' ||
+                    key === 'exterieur_flaques_eau' ||
+                    key === 'exterieur_flaques_fioul'
                 ) {
                     if (!props.changeTextures) {
                         return null;
+                    } else {
+                        return (
+                            <primitive
+                                key={key}
+                                object={nodes[key]}
+                            />
+                        );
                     }
                 }
 

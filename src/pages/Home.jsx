@@ -81,7 +81,7 @@ function Home() {
         setTimeout(() => {
             setIsReset(false);
             setResetTextures(false);
-        }, 100); // Reset the reset state after a short delay to allow re-rendering
+        }, 200); // Reset the reset state after a short delay to allow re-rendering
     };
 
     const { dLightPosition, dLightIntensity } = useControls('Directional Light', {

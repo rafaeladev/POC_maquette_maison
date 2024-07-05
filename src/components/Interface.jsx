@@ -32,7 +32,13 @@ function Interface(props) {
         <div className='scenario_list'>
             <div
                 className='scenario_correction'
-                style={{ opacity: `${props.isReset ? '100%' : '0'}` }}
+                style={{
+                    opacity: `${
+                        props.isScenarioChanged && !props.isWaterMoving && !props.isWaterMovingUp
+                            ? '100%'
+                            : '0'
+                    }`,
+                }}
             >
                 <button
                     className='button_white'
