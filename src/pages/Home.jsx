@@ -34,6 +34,8 @@ function Home() {
   const [changeTextures, setChangeTextures] = useState(false);
   const [resetTextures, setResetTextures] = useState(false);
 
+  const [moveCamera, setMoveCamera] = useState(true);
+
   const toggleWaterMovingUp = () => {
     setIsWaterMovingUp((prev) => !prev);
   };
@@ -54,7 +56,12 @@ function Home() {
     setChangeTextures((prev) => !prev);
   };
 
+  const toggleCameraPosition = () => {
+    setMoveCamera((prev) => !prev);
+  };
+
   const handleCameraPosition = (location) => {
+    toggleCameraPosition();
     if (location === "cuisine") {
       setCameraPosition(new Vector3(5.94, 1.85, 4.13));
       setCameraTarget(new Vector3(5, 1, 0));
@@ -182,6 +189,8 @@ function Home() {
               toggleTextures={toggleTextures}
               cameraPosition={cameraPosition}
               cameraTarget={cameraTarget}
+              moveCamera={moveCamera}
+              setMoveCamera={toggleCameraPosition}
             />
           </Canvas>
         </div>

@@ -496,9 +496,8 @@ function Scene(props) {
     () => new THREE.Vector3(100, 100, 100)
   );
   const [smoothedCameraTarget] = useState(() => new THREE.Vector3());
-  /* 
-  const smoothedCameraPosition = useRef(new THREE.Vector3());
-  const smoothedCameraTarget = useRef(new THREE.Vector3()); */
+
+  /* const smoothedCameraTarget = useRef(new THREE.Vector3()); */
 
   /* useEffect(() => {
     if (props.cameraPosition && props.cameraTarget) {
@@ -520,10 +519,20 @@ function Scene(props) {
     smoothedCameraPosition.lerp(props.cameraPosition, 5 * delta);
     smoothedCameraTarget.lerp(props.cameraTarget, 5 * delta);
 
-    state.camera.position.copy(smoothedCameraPosition);
-    state.camera.lookAt(smoothedCameraTarget);
+    if (props.moveCamera) {
+      state.camera.position.copy(smoothedCameraPosition);
+      state.camera.lookAt(smoothedCameraTarget);
+    }
+
+    console.log(state.camera.position.x);
+    console.log(props.moveCamera);
+
+    if (state.camera.position.x === -12.080000000000002) {
+      props.setMoveCamera();
+    }
 
     if (orbitControlsRef.current) {
+      /*  console.log(orbitControlsRef.current.object.position); */
       orbitControlsRef.current.target.copy(smoothedCameraTarget);
       orbitControlsRef.current.update();
     }
