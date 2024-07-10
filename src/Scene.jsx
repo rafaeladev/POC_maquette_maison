@@ -5,26 +5,14 @@
 import React, { useRef, useEffect, useState, useMemo } from 'react';
 
 // imports drei
-import {
-    OrbitControls,
-    useAnimations,
-    Text,
-    Stage,
-    useHelper,
-    Sky,
-    BakeShadows,
-    ContactShadows,
-    SoftShadows,
-    PresentationControls,
-} from '@react-three/drei';
+import { OrbitControls, useAnimations } from '@react-three/drei';
 
 // imports React Three Fiber
-import { useFrame, useLoader, useThree } from '@react-three/fiber';
+import { useFrame, useLoader } from '@react-three/fiber';
 
 // imports Three.js
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
-import { Vector3 } from 'three';
 
 // imports des shaders
 import waterVertexShader from './shaders/water/vertex.glsl';
@@ -38,12 +26,14 @@ import { useControls } from 'leva';
 import { startAnimation } from './utils/WaterAnimation.js';
 import { loadTextures } from './utils/textureLoader.js';
 import textures from './data/textures.json';
-import { TexturesSales } from './utils/texturesSales.js';
-
-import { TextureLoader } from 'three';
 
 // Approche  n°2 avec Water from three-stdlib
 import Ocean from './Ocean.jsx';
+
+// imports GSAP
+import { gsap } from 'gsap';
+
+console.log(gsap);
 
 // Fonction pour appliquer les textures aux objets
 const applyMaterial = (node, loadedTextures, name) => {
@@ -164,12 +154,76 @@ function Scene(props) {
 
     // ---  Debug controls --- //
 
+    // References
+    const eauPiscine = useRef();
+    const eauExterieur = useRef();
+    const eauPiscineCote = useRef();
+    const eauExterieurCote = useRef();
+    const orbitControlsRef = useRef();
+    const waterMaterialRef = useRef();
+    const waterMaterialSideRef = useRef();
+    const overlayMaterialRef = useRef();
+
+    // -- Overlay material -- //
+    const overlayGeometry = new THREE.PlaneGeometry(2, 2, 1, 1);
+    const overlayMaterial = new THREE.ShaderMaterial({
+        transparent: true,
+        uniforms: {
+            uAlpha: { value: 0.5 },
+        },
+        vertexShader: `
+               void main()
+               {
+                  gl_Position = vec4(position, 1.0);
+               }
+           `,
+        fragmentShader: `
+               uniform float uAlpha;
+   
+               void main()
+               {
+                   gl_FragColor = vec4(0.0, 0.0, 0.0, uAlpha);
+               }
+           `,
+    });
+    // -- Overlay material -- //
+
     // --- Model --- //
-    const { nodes, animations } = useLoader(GLTFLoader, './model/Maquette_v7.glb');
+    const [isLoaded, setIsLoaded] = useState(false);
+    const [loadingProgress, setLoadingProgress] = useState(0);
+    const loadingManager = new THREE.LoadingManager();
+
+    useEffect(() => {
+        if (overlayMaterialRef.current && isLoaded) {
+            console.log('Fade out overlay');
+            console.log(overlayMaterialRef.current.material.uniforms.uAlpha.value);
+            gsap.to(overlayMaterialRef.current.material.uniforms.uAlpha, {
+                duration: 3,
+                value: 0,
+            });
+        }
+    }, [isLoaded, overlayMaterialRef.current]);
+
+    loadingManager.onLoad = () => {
+        console.log('All assets loaded.');
+        setIsLoaded(true); // Set isLoaded to true when everything is loaded
+    };
+
+    loadingManager.onProgress = (url, itemsLoaded, itemsTotal) => {
+        const progress = (itemsLoaded / itemsTotal) * 100;
+        setLoadingProgress(progress); // Update loading progress
+        console.log(`Loading file: ${url}. Loaded ${itemsLoaded} of ${itemsTotal} files.`);
+    };
+
+    // Use the loading manager with useLoader
+    const { nodes, animations } = useLoader(GLTFLoader, './model/Maquette_v7.glb', (loader) => {
+        loader.manager = loadingManager;
+    });
 
     const [damagedNodes, setDamagedNodes] = useState({});
     const [cleanNodes, setCleanNodes] = useState({});
 
+    // Filtrer les objets abîmés et propres
     useEffect(() => {
         // Créer des objets pour stocker les objets abîmés et propres
         const damaged = {};
@@ -185,6 +239,7 @@ function Scene(props) {
         setCleanNodes(clean);
     }, [nodes]);
 
+    // Fonction pour déterminer si un nœud doit être affiché
     const shouldShowNode = (key) => {
         if (props.isReset) {
             // Montrer les objets propres et cacher les abîmés en cas de reset
@@ -225,6 +280,8 @@ function Scene(props) {
         // console.log(!key.includes('_abime')); // Par défaut, montrer les objets propres et cacher les abîmés
         return !key.includes('_abime');
     };
+
+    // --- Model --- //
 
     // --- Textures --- //
     const [texturesLoaded, setTexturesLoaded] = useState(false);
@@ -317,15 +374,6 @@ function Scene(props) {
     }, [props.resetTextures, nodes]);
 
     // --- Textures --- //
-
-    // References
-    const eauPiscine = useRef();
-    const eauExterieur = useRef();
-    const eauPiscineCote = useRef();
-    const eauExterieurCote = useRef();
-    const orbitControlsRef = useRef();
-    const waterMaterialRef = useRef();
-    const waterMaterialSideRef = useRef();
 
     // --- Model --- //
 
@@ -436,13 +484,12 @@ function Scene(props) {
  */
 
     useEffect(() => {
-        if (props.isScenarioChanged && !props.isWaterMoving && !props.isWaterMovingUp) {
+        if (props.menuButtonClick) {
             setIsCameraAuto(true);
         }
     }, [props.isScenarioChanged, props.isWaterMoving, props.isWaterMovingUp, props.cameraPosition]);
-    useFrame((state, delta) => {
-        console.log('Move Camera props : ', props.moveCamera, 'isCameraauto :', isCameraAuto);
 
+    useFrame((state, delta) => {
         if (props.moveCamera && isCameraAuto) {
             smoothedCameraPosition.lerp(props.cameraPosition, 5 * delta);
             smoothedCameraTarget.lerp(props.cameraTarget, 5 * delta);
@@ -571,13 +618,12 @@ function Scene(props) {
     // --- Animation de l'eau --- //
 
     // --- Loading des objets --- //
-    const [isLoaded, setIsLoaded] = useState(false);
 
-    useEffect(() => {
-        if (nodes && Object.keys(nodes).length > 0 && animations) {
-            setIsLoaded(true);
-        }
-    }, [nodes, animations]);
+    // useEffect(() => {
+    //     if (nodes && Object.keys(nodes).length > 0 && animations) {
+    //         setIsLoaded(true);
+    //     }
+    // }, [nodes, animations]);
 
     // Function d'aide pour obtenir la référence pour un certain clé
     function getRefForKey(key) {
@@ -600,15 +646,6 @@ function Scene(props) {
     return (
         <>
             {/*  <BakeShadows /> */}
-            {/*  <ContactShadows
-        position={[0, -0.0, 0]}
-        opacity={1}
-        scale={15}
-        resolution={512}
-        blur={2}
-        frames={1}
-      /> */}
-            {/*  pour flutter les shadows, pour qu'elles ne soyent pas sharp*/}
             {/*   <SoftShadows size={5} samples={20} focus={0} /> */}
             <OrbitControls
                 ref={orbitControlsRef}
@@ -725,6 +762,11 @@ function Scene(props) {
                     />
                 );
             })}
+            <mesh
+                geometry={overlayGeometry}
+                material={overlayMaterial}
+                ref={overlayMaterialRef}
+            />
         </>
     );
 }

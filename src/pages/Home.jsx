@@ -25,15 +25,19 @@ function Home() {
     const [isReset, setIsReset] = useState(false);
     const [resetKey, setResetKey] = useState(0);
 
+    const [loading, setLoading] = useState(true);
+
     // Camera animation
     const [cameraPosition, setCameraPosition] = useState(new Vector3(-12.08, 5.28, 9.7));
     const [cameraTarget, setCameraTarget] = useState(new Vector3(0, 0, 0));
+    const [moveCamera, setMoveCamera] = useState(true);
+    const [menuButtonClick, setMenuButtonClick] = useState(false);
 
+    // Texture change
     const [changeTextures, setChangeTextures] = useState(false);
     const [resetTextures, setResetTextures] = useState(false);
 
-    const [moveCamera, setMoveCamera] = useState(true);
-
+    // Change of states for the water animation
     const toggleWaterMovingUp = () => {
         setIsWaterMovingUp((prev) => !prev);
     };
@@ -42,24 +46,30 @@ function Home() {
         setIsWaterMoving((prev) => !prev);
     };
 
+    // Change of states for the scenario
     const toggleScenario = () => {
         setIsScenarioChanged((prev) => !prev); // Toggle entre true et false
     };
 
+    // Change of states for the reset
     const toggleReset = () => {
         setIsReset((prev) => !prev);
     };
 
+    // Change of states for the textures
     const toggleTextures = () => {
         setChangeTextures((prev) => !prev);
     };
 
+    // Change of states for the camera position
     const toggleCameraPosition = () => {
         setMoveCamera((prev) => !prev);
     };
 
+    // Function do handle the change of positions for the camera
     const handleCameraPosition = (location) => {
         setMoveCamera(true); // Passez en mode automatique
+        setMenuButtonClick(true);
         if (location === 'cuisine') {
             setCameraPosition(new Vector3(5.94, 1.85, 4.13));
             setCameraTarget(new Vector3(5, 1, 0));
@@ -74,6 +84,8 @@ function Home() {
             setCameraTarget(new Vector3(3, 0.34, -3.2));
         }
     };
+
+    // Function to reset of the animations
     const handleReset = () => {
         setIsReset(true);
         setIsScenarioChanged();
@@ -90,19 +102,22 @@ function Home() {
         }, 200); // Reset the reset state after a short delay to allow re-rendering
     };
 
+    // UseEffect to handle loading states
+    useEffect(() => {
+        const handleLoadingComplete = () => {
+            setLoading(false); // Met à jour l'état de chargement
+        };
+
+        // Simulez un chargement de 3 secondes pour la démo
+        const timeoutId = setTimeout(handleLoadingComplete, 3000);
+
+        return () => clearTimeout(timeoutId);
+    }, []);
+
     const { dLightPosition, dLightIntensity } = useControls('Directional Light', {
         dLightPosition: { value: [0, 10, 0], step: 0.1 },
         dLightIntensity: { value: 1, step: 0.1 },
     });
-
-    /*   const { sLightPosition, sLightAngle, sLightPenumbra } = useControls(
-    "Spot Light",
-    {
-      sLightPosition: { value: [10, 10, 10], step: 0.1 },
-      sLightAngle: { value: 0.15, step: 0.1 },
-      sLightPenumbra: { value: 1, step: 0.1 },
-    }
-  ); */
 
     const { envMapIntensity, envMapHeight, envMapRadius, envMapScale } = useControls(
         'environment map',
@@ -114,11 +129,6 @@ function Home() {
         }
     );
 
-    /*   const { sunPosition } = useControls("Sun", {
-    sunPosition: { value: [-4.6, 3.2, -7.6], step: 0.1 },
-  });
- */
-
     return (
         <>
             {/* <LoadingBar isLoading={isLoading} progress={progress} /> */}
@@ -128,9 +138,8 @@ function Home() {
                 collapsed={true}
             />
 
-            {/* {!isLoading && ( */}
-
-            <Suspense fallback={<FadeLoaderComponent />}>
+            {/* <Suspense fallback={<FadeLoaderComponent />}> */}
+            <>
                 <div className='webgl'>
                     <Canvas
                         shadows={true}
@@ -151,37 +160,6 @@ function Home() {
                             preset='sunset'
                             intensity={envMapIntensity}
                         />
-                        {/*   <ambientLight intensity={0.5} /> */}
-
-                        {/* <directionalLight
-                            position={dLightPosition}
-                            intensity={dLightIntensity}
-                            ref={dirLight}
-                            castShadow
-                        />
-                        <directionalLightHelper light={dirLight} /> */}
-                        {/*   <spotLight
-              position={sLightPosition}
-              angle={sLightAngle}
-              penumbra={sLightPenumbra}
-              castShadow
-            /> */}
-                        {/*  <Suspense fallback={null}>
-              <Cuisine
-                isScenarioChanged={isScenarioChanged}
-                toggleScenario={toggleScenario}
-                toggleAnimation={toggleWaterMoving}
-                isWaterMoving={isWaterMoving}
-                isWaterMovingUp={isWaterMovingUp}
-                toggleReset={handleReset}
-                isReset={isReset}
-              />
-            </Suspense> */}
-                        {/*  <Sky
-            
-              sunPosition={sunPosition}
-              
-            /> */}
 
                         <Scene
                             isScenarioChanged={isScenarioChanged}
@@ -199,6 +177,7 @@ function Home() {
                             cameraTarget={cameraTarget}
                             moveCamera={moveCamera}
                             setMoveCamera={toggleCameraPosition}
+                            menuButtonClick={menuButtonClick}
                         />
                     </Canvas>
                 </div>
@@ -213,8 +192,8 @@ function Home() {
                     toggleReset={toggleReset}
                     handleCameraPosition={handleCameraPosition}
                 />
-            </Suspense>
-
+            </>
+            {/* </Suspense> */}
             {/* )} */}
         </>
     );
