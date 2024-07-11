@@ -85,6 +85,7 @@ button {
   display: flex;
   gap: 0.5rem;
   margin-bottom: 10px;
+  z-index: 0;
 }
 
 .scenario_correction {
@@ -170,4 +171,6 @@ button:disabled {
   color: white;
   justify-content: center;
   align-items: center;
+  background-color: black;
+  z-index: 100%;
 }

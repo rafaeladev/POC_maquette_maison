@@ -1,18 +1,43 @@
-.loading-bar
-{
-    position: absolute;
-    top: 50%;
-    width: 100%;
-    height: 2px;
-    background: #ffffff;
-    transform: scaleX(0.3);
-    transform-origin: top left;
-    transition: transform 0.5s;
+.loading-container {
+  color: white;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background-color: black;
+  z-index: 1;
+  opacity: 1;
+  transition: opacity 1s ease-out; /* Transition douce pour l'opacité */
 }
 
-.loading-bar.ended
-{
-    transform: scaleX(0);
-    transform-origin: 100% 0;
-    transition: transform 1.5s ease-in-out;
+.loading-container.ended {
+  display: none; /* Masquer l'élément une fois la transition terminée */
+}
+
+.loading-bar {
+  position: absolute;
+  top: 50%;
+  width: 100%;
+  height: 2px;
+  background: #ffffff;
+  transform: scaleX(0.3);
+  transform-origin: top left;
+  transition: transform 0.5s;
+  z-index: 10;
+}
+
+.loading-bar.ended {
+  transform: scaleX(0);
+  display: none;
+  /*  transform-origin: 100% 0; */
+  transition: all 1.5s ease-in-out;
+}
+
+.loading-text {
+  position: absolute;
+  top: 40%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 2rem;
+  font-weight: bold;
+  z-index: 10;
 }
