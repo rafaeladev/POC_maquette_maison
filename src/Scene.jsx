@@ -5,7 +5,7 @@
 import React, { useRef, useEffect, useState, useMemo } from "react";
 
 // imports drei
-import { OrbitControls, useAnimations } from "@react-three/drei";
+import { OrbitControls, useAnimations, Sky } from "@react-three/drei";
 
 // imports React Three Fiber
 import { useFrame, useLoader } from "@react-three/fiber";
@@ -680,7 +680,7 @@ function Scene(props) {
       <directionalLight
         ref={directionalLight}
         position={sunPosition}
-        intensity={dLightIntensity}
+        intensity={2}
         castShadow
         shadow-mapSize={[1024, 1024]}
         shadow-camera-near={1}
@@ -691,7 +691,7 @@ function Scene(props) {
         shadow-camera-left={-10}
         color={0xffd0b5}
       />
-      {/*  <Sky sunPosition={sunPosition} /> */}
+      <Sky sunPosition={sunPosition} />
       {/* Affichage du modèle */}
       {Object.keys(nodes).map((key) => {
         // Exclure la scène du rendu et les salissures

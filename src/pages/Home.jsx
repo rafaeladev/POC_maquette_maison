@@ -106,23 +106,11 @@ function Home() {
     }, 200); // Reset the reset state after a short delay to allow re-rendering
   };
 
-  const { envMapIntensity, envMapHeight, envMapRadius, envMapScale } =
-    useControls("environment map", {
-      envMapIntensity: { value: 7, min: 0, max: 12 },
-      envMapHeight: { value: 7, min: 0, max: 100 },
-      envMapRadius: { value: 28, min: 10, max: 1000 },
-      envMapScale: { value: 100, min: 10, max: 1000 },
-    });
-
-  useEffect(() => {
-    console.log(progress);
-  }, [isLoaded, progress]);
-
   return (
     <>
       <LoadingBar isLoading={!isLoaded} progress={progress} />
 
-      <Leva hidden={false} collapsed={true} />
+      <Leva hidden={true} collapsed={true} />
 
       {/* <Suspense fallback={<FadeLoaderComponent />}> */}
       <>
@@ -138,8 +126,8 @@ function Home() {
             }}
           >
             <color attach="background" args={["#302D38"]} />
-            <Perf position="top-left" />
-            <Environment preset="sunset" intensity={envMapIntensity} />
+            {/*  <Perf position="top-left" /> */}
+            <Environment preset="sunset" intensity={7} />
 
             <Scene
               isScenarioChanged={isScenarioChanged}

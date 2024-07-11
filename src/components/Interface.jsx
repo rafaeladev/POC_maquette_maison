@@ -30,7 +30,7 @@ function Interface(props) {
     <div className="scenario_list">
       <div
         className="scenario_correction"
-        style={{
+        /*   style={{
           opacity: `${
             props.isScenarioChanged &&
             !props.isWaterMoving &&
@@ -38,10 +38,17 @@ function Interface(props) {
               ? "100%"
               : "0"
           }`,
-        }}
+          pointerEvents: `${
+            props.isScenarioChanged &&
+            !props.isWaterMoving &&
+            !props.isWaterMovingUp
+              ? "auto"
+              : "none"
+          }`,
+        }} */
       >
         <button
-          className="button_white"
+          className=""
           onClick={() => {
             props.handleCameraPosition("cuisine");
             handleButtonStateChange("cuisine");
@@ -51,7 +58,7 @@ function Interface(props) {
           Cuisine
         </button>
         <button
-          className="button_white"
+          className=""
           onClick={() => {
             props.handleCameraPosition("salon");
             handleButtonStateChange("salon");
@@ -61,7 +68,7 @@ function Interface(props) {
           Salon
         </button>
         <button
-          className="button_white"
+          className=""
           onClick={() => {
             props.handleCameraPosition("sdb");
             handleButtonStateChange("sdb");
@@ -71,7 +78,7 @@ function Interface(props) {
           Salle de Bains
         </button>
         <button
-          className="button_white"
+          className=""
           onClick={() => {
             props.handleCameraPosition("jardin");
             handleButtonStateChange("jardin");
@@ -90,7 +97,7 @@ function Interface(props) {
 
       <div className="scenario_animation">
         <button
-          className="button_black"
+          className="button_animation_menu"
           onClick={() => {
             handleButtonClick();
           }}
@@ -101,18 +108,18 @@ function Interface(props) {
             : props.isWaterMovingUp
             ? "Descente"
             : "Montée"}
-          {` ${props.isWaterMoving ? `` : "Eau"} `}
+          {` ${props.isWaterMoving ? `` : "des eaux"} `}
         </button>
 
-        <button
-          className="button_black"
+        {/*   <button
+          className="button_animation_menu"
           onClick={() => {
             props.handleReset();
           }}
           disabled={!allButtonsClicked}
         >
           Reset
-        </button>
+        </button> */}
       </div>
     </div>
   );

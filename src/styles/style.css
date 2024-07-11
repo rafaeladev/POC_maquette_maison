@@ -1,3 +1,29 @@
+@import url("https://fonts.googleapis.com/css2?family=Barlow:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap");
+
+:root {
+  /* Déclaration des couleurs */
+  --color-yellow: #ffe600;
+  --color-black: #000000;
+  --color-teal-1: #01a9af;
+  --color-teal-2: #34babf;
+  --color-teal-3: #80d4d7;
+  --color-light-teal: #cceeef;
+  --color-orange: #f8a941;
+
+  /* Déclaration des types de police */
+  --font-family-primary: "Barlow", sans-serif;
+  --font-weight-light: 300;
+  --font-weight-regular: 400;
+  --font-weight-medium: 600;
+  --font-weight-bold: 700;
+
+  /* Déclaration des tailles de police */
+  --font-size-h1: 24px;
+  --font-size-p: 14px;
+  --font-size-cta: 14px;
+  --font-size-cta-2: 16px;
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -9,6 +35,8 @@ body,
   background-color: black;
   width: 100%;
   height: 100%;
+  font-size: var(--font-size-p);
+  font-family: var(--font-family-primary);
 }
 
 html,
@@ -46,7 +74,6 @@ body {
 }
 
 button {
-  font-size: 18px;
   z-index: 100;
   width: 200px;
   height: 50px;
@@ -56,9 +83,16 @@ button {
   transition: all 0.3s ease-in-out;
 }
 
-.button_black {
-  color: #ffffff;
-  background-color: #000000;
+.button_animation_menu {
+  color: var(--color-teal-1);
+  background-color: white;
+  font-weight: var(--font-weight-medium);
+  border-radius: 2.85rem;
+}
+
+.button_animation_menu:hover {
+  background-color: var(--color-teal-1);
+  color: white;
 }
 
 .button_white {
@@ -67,8 +101,6 @@ button {
 }
 
 .scenario_title {
-  font-family: Helvetica, Arial, sans-serif;
-  font-size: 18px;
   color: #000000;
   font-weight: bold;
   display: flex;
@@ -83,6 +115,11 @@ button {
 
 .scenario_animation {
   display: flex;
+  justify-content: center;
+  background-color: white;
+  width: 90%;
+  border-radius: 2.85rem;
+  padding: 0.28rem;
   gap: 0.5rem;
   margin-bottom: 10px;
   z-index: 0;
@@ -95,7 +132,8 @@ button {
 }
 
 button:hover {
-  opacity: 100%;
+  background-color: var(--color-teal-1);
+  color: white;
 }
 
 button:disabled {
@@ -123,11 +161,9 @@ button:disabled {
   background: #00000077;
   border: 1px solid #ffffff77;
   color: #ffffff;
-  font-family: Helvetica, Arial, sans-serif;
   text-align: center;
   line-height: 40px;
   font-weight: 100;
-  font-size: 14px;
   transform: scale(1);
   transition: transform 0.3s;
 }
@@ -143,9 +179,7 @@ button:disabled {
   border: 1px solid #ffffff77;
   color: #ffffff;
   line-height: 1.3em;
-  font-family: Helvetica, Arial, sans-serif;
   font-weight: 100;
-  font-size: 14px;
   opacity: 0;
   transition: opacity 0.3s;
   pointer-events: none;
