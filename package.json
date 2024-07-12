@@ -22,6 +22,8 @@
     "r3f-perf": "^7.2.1",
     "react": "18.2",
     "react-dom": "18.2",
+    "react-icons": "^5.2.1",
+    "react-router-dom": "^6.24.1",
     "react-spinners": "^0.13.8",
     "rollup-plugin-visualizer": "^5.12.0",
     "three": "^0.153.0",

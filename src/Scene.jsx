@@ -2,190 +2,182 @@
 // Ce composant est responsable de l'affichage de la scène 3D
 
 // imports React
-import React, { useRef, useEffect, useState, useMemo } from "react";
+import React, { useRef, useEffect, useState, useMemo } from 'react';
 
 // imports drei
-import { OrbitControls, useAnimations, Sky } from "@react-three/drei";
+import { OrbitControls, useAnimations, Sky } from '@react-three/drei';
 
 // imports React Three Fiber
-import { useFrame, useLoader } from "@react-three/fiber";
+import { useFrame, useLoader } from '@react-three/fiber';
 
 // imports Three.js
-import * as THREE from "three";
-import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
+import * as THREE from 'three';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 
 // imports des shaders
-import waterVertexShader from "./shaders/water/vertex.glsl";
-import waterFragmentShader from "./shaders/water/fragment.glsl";
-import waterFragmentShaderSide from "./shaders/waterSide/fragment.glsl";
+import waterVertexShader from './shaders/water/vertex.glsl';
+import waterFragmentShader from './shaders/water/fragment.glsl';
+import waterFragmentShaderSide from './shaders/waterSide/fragment.glsl';
 
 // imports des composants
-import { useControls } from "leva";
+import { useControls } from 'leva';
 
 // imports des utils .js
-import { startAnimation } from "./utils/WaterAnimation.js";
-import { loadTextures } from "./utils/textureLoader.js";
-import textures from "./data/textures.json";
+import { startAnimation } from './utils/WaterAnimation.js';
+import { loadTextures } from './utils/textureLoader.js';
+import textures from './data/textures.json';
 
 // Approche  n°2 avec Water from three-stdlib
-import Ocean from "./Ocean.jsx";
+import Ocean from './Ocean.jsx';
 
 // imports GSAP
-import { gsap } from "gsap";
+import { gsap } from 'gsap';
 
 console.log(gsap);
 
 // Fonction pour appliquer les textures aux objets
 const applyMaterial = (node, loadedTextures, name) => {
-  let materialOptions;
+    let materialOptions;
 
-  // console.log(name);
-  if (
-    name === "plastique_blanc" ||
-    name === "Plastique_noir" ||
-    name === "plante" ||
-    name === "Cuir"
-  ) {
-    materialOptions = {
-      color:
-        name === "plastique_blanc"
-          ? 0xffffff
-          : name === "Plastique_noir"
-          ? 0x000000
-          : name === "plante"
-          ? 0x6e7d65
-          : 0x3b2517,
-      name: name,
-    };
-  } else {
-    materialOptions = {
-      map: loadedTextures.colorMap || null,
-      normalMap: loadedTextures.normalMap || null,
-      roughnessMap: loadedTextures.roughnessMap || null,
-      metalnessMap: loadedTextures.metalnessMap || null,
-      alphaMap: loadedTextures.alphaMap || null,
-      name: name,
-    };
-  }
+    // console.log(name);
+    if (
+        name === 'plastique_blanc' ||
+        name === 'Plastique_noir' ||
+        name === 'plante' ||
+        name === 'Cuir'
+    ) {
+        materialOptions = {
+            color:
+                name === 'plastique_blanc'
+                    ? 0xffffff
+                    : name === 'Plastique_noir'
+                    ? 0x000000
+                    : name === 'plante'
+                    ? 0x6e7d65
+                    : 0x3b2517,
+            name: name,
+        };
+    } else {
+        materialOptions = {
+            map: loadedTextures.colorMap || null,
+            normalMap: loadedTextures.normalMap || null,
+            roughnessMap: loadedTextures.roughnessMap || null,
+            metalnessMap: loadedTextures.metalnessMap || null,
+            alphaMap: loadedTextures.alphaMap || null,
+            name: name,
+        };
+    }
 
-  if (materialOptions.normalMap) {
-    materialOptions.normalMap.wrapS = THREE.RepeatWrapping;
-    materialOptions.normalMap.wrapT = THREE.RepeatWrapping;
-  }
+    if (materialOptions.normalMap) {
+        materialOptions.normalMap.wrapS = THREE.RepeatWrapping;
+        materialOptions.normalMap.wrapT = THREE.RepeatWrapping;
+    }
 
-  if (materialOptions.map) {
-    materialOptions.map.wrapS = THREE.RepeatWrapping;
-    materialOptions.map.wrapT = THREE.RepeatWrapping;
-  }
+    if (materialOptions.map) {
+        materialOptions.map.wrapS = THREE.RepeatWrapping;
+        materialOptions.map.wrapT = THREE.RepeatWrapping;
+    }
 
-  if (materialOptions.roughnessMap) {
-    materialOptions.roughnessMap.wrapS = THREE.RepeatWrapping;
-    materialOptions.roughnessMap.wrapT = THREE.RepeatWrapping;
-  }
+    if (materialOptions.roughnessMap) {
+        materialOptions.roughnessMap.wrapS = THREE.RepeatWrapping;
+        materialOptions.roughnessMap.wrapT = THREE.RepeatWrapping;
+    }
 
-  if (materialOptions.metalnessMap) {
-    materialOptions.metalnessMap.wrapS = THREE.RepeatWrapping;
-    materialOptions.metalnessMap.wrapT = THREE.RepeatWrapping;
-  }
+    if (materialOptions.metalnessMap) {
+        materialOptions.metalnessMap.wrapS = THREE.RepeatWrapping;
+        materialOptions.metalnessMap.wrapT = THREE.RepeatWrapping;
+    }
 
-  // if (materialOptions.alphaMap) {
-  //     materialOptions.alphaMap.wrapS = THREE.RepeatWrapping;
-  //     materialOptions.alphaMap.wrapT = THREE.RepeatWrapping;
-  // }
+    // if (materialOptions.alphaMap) {
+    //     materialOptions.alphaMap.wrapS = THREE.RepeatWrapping;
+    //     materialOptions.alphaMap.wrapT = THREE.RepeatWrapping;
+    // }
 
-  node.material = new THREE.MeshStandardMaterial(materialOptions);
-  node.material.needsUpdate = true;
+    node.material = new THREE.MeshStandardMaterial(materialOptions);
+    node.material.needsUpdate = true;
 };
 
 function Scene(props) {
-  // ---  Debug controls --- //
-  // Approche n°1 avec shaderMaterial
-  const { Elevation, FrequencyX, FrequencyY, Speed } = useControls(
-    "Big Waves",
-    {
-      Elevation: { value: 0.02, min: 0, max: 1, step: 0.001 },
-      FrequencyX: { value: 2.5, min: 0, max: 10, step: 0.001 },
-      FrequencyY: { value: 2.5, min: 0, max: 10, step: 0.001 },
-      Speed: { value: 1.72, min: 0, max: 4, step: 0.001 },
-    }
-  );
-
-  const {
-    uSmallWavesElevation,
-    uSmallWavesFrequency,
-    uSmallWavesSpeed,
-    uSmallIterations,
-  } = useControls("Small Waves", {
-    uSmallWavesElevation: { value: 0.07, min: 0, max: 1, step: 0.001 },
-    uSmallWavesFrequency: { value: 2.43, min: 0, max: 30, step: 0.001 },
-    uSmallWavesSpeed: { value: 0.97, min: 0, max: 4, step: 0.001 },
-    uSmallIterations: { value: 1, min: 0, max: 5, step: 1 },
-  });
-
-  const { depthColor, surfaceColor, uColorOffset, uColorMultiplier, uOpacity } =
-    useControls("Waves colors", {
-      depthColor: "#5e98ba",
-      surfaceColor: "#c1def5",
-      uColorOffset: { value: 0.08, min: 0, max: 1, step: 0.001 },
-      uColorMultiplier: { value: 5, min: 0, max: 10, step: 0.001 },
-      uOpacity: { value: 0.2, min: 0, max: 1, step: 0.01 },
+    // ---  Debug controls --- //
+    // Approche n°1 avec shaderMaterial
+    const { Elevation, FrequencyX, FrequencyY, Speed } = useControls('Big Waves', {
+        Elevation: { value: 0.02, min: 0, max: 1, step: 0.001 },
+        FrequencyX: { value: 2.5, min: 0, max: 10, step: 0.001 },
+        FrequencyY: { value: 2.5, min: 0, max: 10, step: 0.001 },
+        Speed: { value: 1.72, min: 0, max: 4, step: 0.001 },
     });
 
-  const { sunPosition } = useControls("Sun", {
-    sunPosition: { value: [-3.9, 9.9, 10.1], step: 0.1 },
-  });
+    const { uSmallWavesElevation, uSmallWavesFrequency, uSmallWavesSpeed, uSmallIterations } =
+        useControls('Small Waves', {
+            uSmallWavesElevation: { value: 0.07, min: 0, max: 1, step: 0.001 },
+            uSmallWavesFrequency: { value: 2.43, min: 0, max: 30, step: 0.001 },
+            uSmallWavesSpeed: { value: 0.97, min: 0, max: 4, step: 0.001 },
+            uSmallIterations: { value: 1, min: 0, max: 5, step: 1 },
+        });
 
-  const orbitControls = useControls("Orbit Controls", {
-    enableDamping: false,
-    dampingFactor: 0.25,
-    enableZoom: true,
-    enableRotate: true,
-    enablePan: true,
-    minPolarAngle: 0,
-    maxPolarAngle: (80 * Math.PI) / 180,
+    const { depthColor, surfaceColor, uColorOffset, uColorMultiplier, uOpacity } = useControls(
+        'Waves colors',
+        {
+            depthColor: '#5e98ba',
+            surfaceColor: '#c1def5',
+            uColorOffset: { value: 0.08, min: 0, max: 1, step: 0.001 },
+            uColorMultiplier: { value: 5, min: 0, max: 10, step: 0.001 },
+            uOpacity: { value: 0.2, min: 0, max: 1, step: 0.01 },
+        }
+    );
 
-    minAzimuthAngle: -Infinity,
-    maxAzimuthAngle: Infinity,
-    minDistance: -10,
-    maxDistance: 17,
-    /*  position0: props.cameraPosition, */
-  });
+    const { sunPosition } = useControls('Sun', {
+        sunPosition: { value: [-3.9, 9.9, 10.1], step: 0.1 },
+    });
 
-  const { dLightPosition, dLightIntensity, dLightTarget } = useControls(
-    "Directional Light",
-    {
-      dLightPosition: { value: [-4.6, 3.2, -7.6], step: 0.1 },
-      dLightIntensity: { value: 0.1, step: 0.1 },
-      dLightTarget: { value: [0, 0, 0] },
-    }
-  );
+    const orbitControls = useControls('Orbit Controls', {
+        enableDamping: false,
+        dampingFactor: 0.25,
+        enableZoom: true,
+        enableRotate: true,
+        enablePan: true,
+        minPolarAngle: 0,
+        maxPolarAngle: (80 * Math.PI) / 180,
 
-  // ---  Debug controls --- //
+        minAzimuthAngle: -Infinity,
+        maxAzimuthAngle: Infinity,
+        minDistance: -10,
+        maxDistance: 17,
+        /*  position0: props.cameraPosition, */
+    });
 
-  // References
-  const eauPiscine = useRef();
-  const eauExterieur = useRef();
-  const eauPiscineCote = useRef();
-  const eauExterieurCote = useRef();
-  const orbitControlsRef = useRef();
-  const waterMaterialRef = useRef();
-  const waterMaterialSideRef = useRef();
-  const overlayMaterialRef = useRef();
+    const { dLightPosition, dLightIntensity, dLightTarget } = useControls('Directional Light', {
+        dLightPosition: { value: [-4.6, 3.2, -7.6], step: 0.1 },
+        dLightIntensity: { value: 0.1, step: 0.1 },
+        dLightTarget: { value: [0, 0, 0] },
+    });
 
-  // -- Overlay material -- //
-  const overlayGeometry = new THREE.PlaneGeometry(2, 2, 1, 1);
-  const overlayMaterial = new THREE.ShaderMaterial({
-    transparent: true,
-    uniforms: {
-      uAlpha: { value: 0 },
-    },
-    vertexShader: `
+    // ---  Debug controls --- //
+
+    // References
+    const eauPiscine = useRef();
+    const eauExterieur = useRef();
+    const eauPiscineCote = useRef();
+    const eauExterieurCote = useRef();
+    const orbitControlsRef = useRef();
+    const waterMaterialRef = useRef();
+    const waterMaterialSideRef = useRef();
+    const overlayMaterialRef = useRef();
+
+    // -- Overlay material -- //
+    const overlayGeometry = new THREE.PlaneGeometry(2, 2, 1, 1);
+    const overlayMaterial = new THREE.ShaderMaterial({
+        transparent: true,
+        uniforms: {
+            uAlpha: { value: 0.15 },
+        },
+        vertexShader: `
                void main()
                {
                   gl_Position = vec4(position, 1.0);
                }
            `,
-    fragmentShader: `
+        fragmentShader: `
                uniform float uAlpha;
    
                void main()
@@ -193,286 +185,278 @@ function Scene(props) {
                    gl_FragColor = vec4(0.0, 0.0, 0.0, uAlpha);
                }
            `,
-  });
-  // -- Overlay material -- //
+    });
+    // -- Overlay material -- //
 
-  // --- Model --- //
-  const loadingManager = new THREE.LoadingManager();
+    // --- Model --- //
+    const loadingManager = new THREE.LoadingManager();
 
-  loadingManager.onLoad = () => {
-    /* console.log("All assets loaded."); */
-    props.setIsLoaded(true); // Set isLoaded to true when everything is loaded
-  };
+    loadingManager.onLoad = () => {
+        /* console.log("All assets loaded."); */
+        props.setIsLoaded(true); // Set isLoaded to true when everything is loaded
+    };
 
-  loadingManager.onProgress = (url, itemsLoaded, itemsTotal) => {
-    const progress = itemsLoaded / itemsTotal;
-    props.setLoadingProgress(progress); // Update loading progress
-    /*   console.log(
+    loadingManager.onProgress = (url, itemsLoaded, itemsTotal) => {
+        const progress = itemsLoaded / itemsTotal;
+        props.setLoadingProgress(progress); // Update loading progress
+        /*   console.log(
       `Loading file: ${url}. Loaded ${itemsLoaded} of ${itemsTotal} files.`
     );
     console.log(progress); */
-  };
-
-  // Use the loading manager with useLoader
-  const { nodes, animations } = useLoader(
-    GLTFLoader,
-    "./model/Maquette_v7.glb",
-    (loader) => {
-      loader.manager = loadingManager;
-    }
-  );
-
-  const [damagedNodes, setDamagedNodes] = useState({});
-  const [cleanNodes, setCleanNodes] = useState({});
-
-  // Filtrer les objets abîmés et propres
-  useEffect(() => {
-    // Créer des objets pour stocker les objets abîmés et propres
-    const damaged = {};
-    const clean = {};
-    Object.keys(nodes).forEach((key) => {
-      if (key.includes("_abime")) {
-        damaged[key] = nodes[key];
-      } else {
-        clean[key] = nodes[key];
-      }
-    });
-    setDamagedNodes(damaged);
-    setCleanNodes(clean);
-  }, [nodes]);
-
-  // Fonction pour déterminer si un nœud doit être affiché
-  const shouldShowNode = (key) => {
-    if (props.isReset) {
-      // Montrer les objets propres et cacher les abîmés en cas de reset
-      return !key.includes("_abime");
-    } else if (props.isScenarioChanged) {
-      // Montrer les objets abîmés et cacher les doublons propres
-      if (key.includes("_abime")) {
-        return true;
-      }
-
-      // Trouver la version abîmée de la clé
-      const baseKey = `${key}_abime`;
-
-      if (damagedNodes[baseKey]) {
-        if (nodes[key] && nodes[key].isGroup) {
-          if (damagedNodes[`_1_${baseKey}`]) {
-            return false;
-          }
-
-          // for (let i = 3; i < 4; i++) {
-          //     console.log(`${key}_${i}`);
-          //     if (cleanNodes[`${key}_${i}`]) {
-          //         return false;
-          //     }
-          // }
-          // console.log(nodes[key]);
-          // // Supprimez les enfants du groupe
-          // nodes[key].traverse((child) => {
-          //     if (child !== nodes[key]) {
-          //         child.visible = false;
-          //     }
-          // });
-        }
-        return false;
-      }
-    }
-    // console.log(key);
-    // console.log(!key.includes('_abime')); // Par défaut, montrer les objets propres et cacher les abîmés
-    return !key.includes("_abime");
-  };
-
-  // --- Model --- //
-
-  // --- Textures --- //
-  const [texturesLoaded, setTexturesLoaded] = useState(false);
-
-  // Fonction pour charger les textures
-  const handleTextureLoading = async (nodes, textureAction) => {
-    const promises = Object.keys(nodes).map(async (key) => {
-      const node = nodes[key];
-
-      if (node && node.material) {
-        const materialName = node.material.name;
-        let targetMaterialName = materialName;
-
-        if (textureAction === "change") {
-          targetMaterialName = `${materialName}_sale`;
-        } else if (textureAction === "reset") {
-          targetMaterialName = materialName.replace("_sale", "");
-        }
-
-        if (materialName && textures.materials[targetMaterialName]) {
-          try {
-            const loadedTextures = await loadTextures(targetMaterialName);
-
-            if (textureAction === "reset" || textureAction === "change") {
-              applyMaterial(node, loadedTextures, targetMaterialName);
-            }
-          } catch (error) {
-            console.error(
-              `Failed to load textures for material ${targetMaterialName}:`,
-              error
-            );
-          }
-        } else if (
-          materialName &&
-          (targetMaterialName === "plastique_blanc" ||
-            targetMaterialName === "Plastique_noir" ||
-            targetMaterialName === "plante" ||
-            targetMaterialName === "Cuir") &&
-          textureAction === "reset"
-        ) {
-          applyMaterial(node, null, targetMaterialName);
-        }
-      }
-    });
-
-    await Promise.all(promises);
-  };
-
-  // Charger les textures au chargement initial
-  useEffect(() => {
-    const loadAllTextures = async () => {
-      await handleTextureLoading(nodes, "load");
-      setTexturesLoaded(true);
     };
 
-    loadAllTextures();
-  }, [nodes]);
+    // Use the loading manager with useLoader
+    const { nodes, animations } = useLoader(GLTFLoader, './model/Maquette_v7.glb', (loader) => {
+        loader.manager = loadingManager;
+    });
 
-  // Charger les textures lorsqu'elles sont modifiées
-  useEffect(() => {
-    if (props.changeTextures) {
-      const loadAllTextures = async () => {
-        await handleTextureLoading(nodes, "change");
-        setTexturesLoaded(true);
-      };
+    const [damagedNodes, setDamagedNodes] = useState({});
+    const [cleanNodes, setCleanNodes] = useState({});
 
-      loadAllTextures();
-    }
-  }, [props.changeTextures]);
+    // Filtrer les objets abîmés et propres
+    useEffect(() => {
+        // Créer des objets pour stocker les objets abîmés et propres
+        const damaged = {};
+        const clean = {};
+        Object.keys(nodes).forEach((key) => {
+            if (key.includes('_abime')) {
+                damaged[key] = nodes[key];
+            } else {
+                clean[key] = nodes[key];
+            }
+        });
+        setDamagedNodes(damaged);
+        setCleanNodes(clean);
+    }, [nodes]);
 
-  // Réinitialiser les textures
-  useEffect(() => {
-    if (props.resetTextures) {
-      console.log("Reset textures");
-      const resetAllTextures = async () => {
-        await handleTextureLoading(nodes, "reset");
-      };
+    // Fonction pour déterminer si un nœud doit être affiché
+    const shouldShowNode = (key) => {
+        if (props.isReset) {
+            // Montrer les objets propres et cacher les abîmés en cas de reset
+            return !key.includes('_abime');
+        } else if (props.isScenarioChanged) {
+            // Montrer les objets abîmés et cacher les doublons propres
+            if (key.includes('_abime')) {
+                return true;
+            }
 
-      resetAllTextures();
+            // Trouver la version abîmée de la clé
+            const baseKey = `${key}_abime`;
 
-      if (waterMaterialRef.current) {
-        waterMaterialRef.current.uniforms.uDepthColor.value.set("#5e98ba");
-        waterMaterialRef.current.uniforms.uSurfaceColor.value.set("#c1def5");
-      }
-      if (waterMaterialSideRef.current) {
-        waterMaterialSideRef.current.uniforms.uDepthColor.value.set("#5e98ba");
-        waterMaterialSideRef.current.uniforms.uSurfaceColor.value.set(
-          "#c1def5"
-        );
-      }
-    }
-  }, [props.resetTextures, nodes]);
+            if (damagedNodes[baseKey]) {
+                if (nodes[key] && nodes[key].isGroup) {
+                    if (damagedNodes[`_1_${baseKey}`]) {
+                        return false;
+                    }
 
-  // --- Textures --- //
+                    // for (let i = 3; i < 4; i++) {
+                    //     console.log(`${key}_${i}`);
+                    //     if (cleanNodes[`${key}_${i}`]) {
+                    //         return false;
+                    //     }
+                    // }
+                    // console.log(nodes[key]);
+                    // // Supprimez les enfants du groupe
+                    // nodes[key].traverse((child) => {
+                    //     if (child !== nodes[key]) {
+                    //         child.visible = false;
+                    //     }
+                    // });
+                }
+                return false;
+            }
+        }
+        // console.log(key);
+        // console.log(!key.includes('_abime')); // Par défaut, montrer les objets propres et cacher les abîmés
+        return !key.includes('_abime');
+    };
 
-  // --- Model --- //
+    // --- Model --- //
 
-  // --- Lights --- //
-  const directionalLight = useRef();
-  /*   useHelper(directionalLight, THREE.DirectionalLightHelper, 1); */
-  // --- Lights --- //
+    // --- Textures --- //
+    const [texturesLoaded, setTexturesLoaded] = useState(false);
 
-  // --- Shader material --- //
-  const fragmentShader = waterFragmentShader;
-  const vertexShader = waterVertexShader;
-  const fragmentShaderSide = waterFragmentShaderSide;
+    // Fonction pour charger les textures
+    const handleTextureLoading = async (nodes, textureAction) => {
+        const promises = Object.keys(nodes).map(async (key) => {
+            const node = nodes[key];
 
-  const data = useMemo(
-    () => ({
-      uniforms: {
-        uTime: { value: 0 },
-        uBigWavesElevation: { value: Elevation },
-        uBigWavesFrequency: {
-          value: new THREE.Vector2(FrequencyX, FrequencyY),
-        },
-        uBigWavesSpeed: { value: Speed },
-        uSmallWavesElevation: { value: uSmallWavesElevation },
-        uSmallWavesFrequency: { value: uSmallWavesFrequency },
-        uSmallWavesSpeed: { value: uSmallWavesSpeed },
-        uSmallIterations: { value: uSmallIterations },
-        uDepthColor: { value: new THREE.Color(depthColor) },
-        uSurfaceColor: { value: new THREE.Color(surfaceColor) },
-        uColorOffset: { value: uColorOffset },
-        uColorMultiplier: { value: uColorMultiplier },
-      },
-      fragmentShader,
-      vertexShader,
-    }),
-    [
-      Elevation,
-      FrequencyX,
-      FrequencyY,
-      Speed,
-      uSmallWavesElevation,
-      uSmallWavesFrequency,
-      uSmallWavesSpeed,
-      uSmallIterations,
-      depthColor,
-      surfaceColor,
-    ]
-  );
+            if (node && node.material) {
+                const materialName = node.material.name;
+                let targetMaterialName = materialName;
 
-  const data2 = useMemo(
-    () => ({
-      uniforms: {
-        uTime: { value: 0 },
-        uBigWavesElevation: { value: Elevation },
-        uBigWavesFrequency: {
-          value: new THREE.Vector2(FrequencyX, FrequencyY),
-        },
-        uBigWavesSpeed: { value: Speed },
-        uSmallWavesElevation: { value: uSmallWavesElevation },
-        uSmallWavesFrequency: { value: uSmallWavesFrequency },
-        uSmallWavesSpeed: { value: uSmallWavesSpeed },
-        uSmallIterations: { value: uSmallIterations },
-        uDepthColor: { value: new THREE.Color(depthColor) },
-        uSurfaceColor: { value: new THREE.Color(surfaceColor) },
-        uColorOffset: { value: uColorOffset },
-        uColorMultiplier: { value: uColorMultiplier },
-        uOpacity: { value: 0.8 },
-      },
-      fragmentShader: fragmentShaderSide,
-      vertexShader,
-    }),
-    [
-      Elevation,
-      FrequencyX,
-      FrequencyY,
-      Speed,
-      uSmallWavesElevation,
-      uSmallWavesFrequency,
-      uSmallWavesSpeed,
-      uSmallIterations,
-      depthColor,
-      surfaceColor,
-      uOpacity,
-    ]
-  );
-  // --- Shader material --- //
+                if (textureAction === 'change') {
+                    targetMaterialName = `${materialName}_sale`;
+                } else if (textureAction === 'reset') {
+                    targetMaterialName = materialName.replace('_sale', '');
+                }
 
-  // --- Camera --- //
-  const [smoothedCameraPosition] = useState(
-    () => new THREE.Vector3(100, 100, 100)
-  );
-  const [smoothedCameraTarget] = useState(() => new THREE.Vector3());
+                if (materialName && textures.materials[targetMaterialName]) {
+                    try {
+                        const loadedTextures = await loadTextures(targetMaterialName);
 
-  const [isCameraAuto, setIsCameraAuto] = useState(true);
+                        if (textureAction === 'reset' || textureAction === 'change') {
+                            applyMaterial(node, loadedTextures, targetMaterialName);
+                        }
+                    } catch (error) {
+                        console.error(
+                            `Failed to load textures for material ${targetMaterialName}:`,
+                            error
+                        );
+                    }
+                } else if (
+                    materialName &&
+                    (targetMaterialName === 'plastique_blanc' ||
+                        targetMaterialName === 'Plastique_noir' ||
+                        targetMaterialName === 'plante' ||
+                        targetMaterialName === 'Cuir') &&
+                    textureAction === 'reset'
+                ) {
+                    applyMaterial(node, null, targetMaterialName);
+                }
+            }
+        });
 
-  /* useEffect(() => {
+        await Promise.all(promises);
+    };
+
+    // Charger les textures au chargement initial
+    useEffect(() => {
+        const loadAllTextures = async () => {
+            await handleTextureLoading(nodes, 'load');
+            setTexturesLoaded(true);
+        };
+
+        loadAllTextures();
+    }, [nodes]);
+
+    // Charger les textures lorsqu'elles sont modifiées
+    useEffect(() => {
+        if (props.changeTextures) {
+            const loadAllTextures = async () => {
+                await handleTextureLoading(nodes, 'change');
+                setTexturesLoaded(true);
+            };
+
+            loadAllTextures();
+        }
+    }, [props.changeTextures]);
+
+    // Réinitialiser les textures
+    useEffect(() => {
+        if (props.resetTextures) {
+            console.log('Reset textures');
+            const resetAllTextures = async () => {
+                await handleTextureLoading(nodes, 'reset');
+            };
+
+            resetAllTextures();
+
+            if (waterMaterialRef.current) {
+                waterMaterialRef.current.uniforms.uDepthColor.value.set('#5e98ba');
+                waterMaterialRef.current.uniforms.uSurfaceColor.value.set('#c1def5');
+            }
+            if (waterMaterialSideRef.current) {
+                waterMaterialSideRef.current.uniforms.uDepthColor.value.set('#5e98ba');
+                waterMaterialSideRef.current.uniforms.uSurfaceColor.value.set('#c1def5');
+            }
+        }
+    }, [props.resetTextures, nodes]);
+
+    // --- Textures --- //
+
+    // --- Model --- //
+
+    // --- Lights --- //
+    const directionalLight = useRef();
+    /*   useHelper(directionalLight, THREE.DirectionalLightHelper, 1); */
+    // --- Lights --- //
+
+    // --- Shader material --- //
+    const fragmentShader = waterFragmentShader;
+    const vertexShader = waterVertexShader;
+    const fragmentShaderSide = waterFragmentShaderSide;
+
+    const data = useMemo(
+        () => ({
+            uniforms: {
+                uTime: { value: 0 },
+                uBigWavesElevation: { value: Elevation },
+                uBigWavesFrequency: {
+                    value: new THREE.Vector2(FrequencyX, FrequencyY),
+                },
+                uBigWavesSpeed: { value: Speed },
+                uSmallWavesElevation: { value: uSmallWavesElevation },
+                uSmallWavesFrequency: { value: uSmallWavesFrequency },
+                uSmallWavesSpeed: { value: uSmallWavesSpeed },
+                uSmallIterations: { value: uSmallIterations },
+                uDepthColor: { value: new THREE.Color(depthColor) },
+                uSurfaceColor: { value: new THREE.Color(surfaceColor) },
+                uColorOffset: { value: uColorOffset },
+                uColorMultiplier: { value: uColorMultiplier },
+            },
+            fragmentShader,
+            vertexShader,
+        }),
+        [
+            Elevation,
+            FrequencyX,
+            FrequencyY,
+            Speed,
+            uSmallWavesElevation,
+            uSmallWavesFrequency,
+            uSmallWavesSpeed,
+            uSmallIterations,
+            depthColor,
+            surfaceColor,
+        ]
+    );
+
+    const data2 = useMemo(
+        () => ({
+            uniforms: {
+                uTime: { value: 0 },
+                uBigWavesElevation: { value: Elevation },
+                uBigWavesFrequency: {
+                    value: new THREE.Vector2(FrequencyX, FrequencyY),
+                },
+                uBigWavesSpeed: { value: Speed },
+                uSmallWavesElevation: { value: uSmallWavesElevation },
+                uSmallWavesFrequency: { value: uSmallWavesFrequency },
+                uSmallWavesSpeed: { value: uSmallWavesSpeed },
+                uSmallIterations: { value: uSmallIterations },
+                uDepthColor: { value: new THREE.Color(depthColor) },
+                uSurfaceColor: { value: new THREE.Color(surfaceColor) },
+                uColorOffset: { value: uColorOffset },
+                uColorMultiplier: { value: uColorMultiplier },
+                uOpacity: { value: 0.8 },
+            },
+            fragmentShader: fragmentShaderSide,
+            vertexShader,
+        }),
+        [
+            Elevation,
+            FrequencyX,
+            FrequencyY,
+            Speed,
+            uSmallWavesElevation,
+            uSmallWavesFrequency,
+            uSmallWavesSpeed,
+            uSmallIterations,
+            depthColor,
+            surfaceColor,
+            uOpacity,
+        ]
+    );
+    // --- Shader material --- //
+
+    // --- Camera --- //
+    const [smoothedCameraPosition] = useState(() => new THREE.Vector3(100, 100, 100));
+    const [smoothedCameraTarget] = useState(() => new THREE.Vector3());
+
+    const [isCameraAuto, setIsCameraAuto] = useState(true);
+
+    /* useEffect(() => {
     if (props.cameraPosition && props.cameraTarget) {
       if (smoothedCameraPosition.current) {
         smoothedCameraPosition.current.copy(props.cameraPosition);
@@ -483,294 +467,298 @@ function Scene(props) {
     }
   }, [props.cameraPosition, props.cameraTarget]); */
 
-  /*   useEffect(() => {
+    /*   useEffect(() => {
     smoothedCameraPosition.current.copy(props.cameraPosition);
     smoothedCameraTarget.current.copy(props.cameraTarget);
   }, [props.cameraPosition, props.cameraTarget]);
  */
 
-  useEffect(() => {
-    if (props.menuButtonClick) {
-      setIsCameraAuto(true);
-    }
-  }, [
-    props.isScenarioChanged,
-    props.isWaterMoving,
-    props.isWaterMovingUp,
-    props.cameraPosition,
-  ]);
+    useEffect(() => {
+        if (props.menuButtonClick) {
+            setIsCameraAuto(true);
+        }
+    }, [props.isScenarioChanged, props.isWaterMoving, props.isWaterMovingUp, props.cameraPosition]);
 
-  useFrame((state, delta) => {
-    if (props.moveCamera && isCameraAuto) {
-      smoothedCameraPosition.lerp(props.cameraPosition, 5 * delta);
-      smoothedCameraTarget.lerp(props.cameraTarget, 5 * delta);
+    useFrame((state, delta) => {
+        if (props.moveCamera && isCameraAuto) {
+            smoothedCameraPosition.lerp(props.cameraPosition, 5 * delta);
+            smoothedCameraTarget.lerp(props.cameraTarget, 5 * delta);
 
-      state.camera.position.copy(smoothedCameraPosition);
-      state.camera.lookAt(smoothedCameraTarget);
+            state.camera.position.copy(smoothedCameraPosition);
+            state.camera.lookAt(smoothedCameraTarget);
 
-      if (orbitControlsRef.current) {
-        /*  console.log(orbitControlsRef.current.object.position); */
-        orbitControlsRef.current.target.copy(smoothedCameraTarget);
-        orbitControlsRef.current.update();
-      }
+            if (orbitControlsRef.current) {
+                /*  console.log(orbitControlsRef.current.object.position); */
+                orbitControlsRef.current.target.copy(smoothedCameraTarget);
+                orbitControlsRef.current.update();
+            }
 
-      // Vérifiez si la caméra a atteint la nouvelle position
-      if (
-        smoothedCameraPosition.distanceTo(props.cameraPosition) < 0.1 &&
-        smoothedCameraTarget.distanceTo(props.cameraTarget) < 0.1
-      ) {
-        props.setMoveCamera(false); // Arrêtez de déplacer la caméra
-        setIsCameraAuto(false); // Passez en mode manuel
-      }
-    }
-  });
+            // Vérifiez si la caméra a atteint la nouvelle position
+            if (
+                smoothedCameraPosition.distanceTo(props.cameraPosition) < 0.1 &&
+                smoothedCameraTarget.distanceTo(props.cameraTarget) < 0.1
+            ) {
+                props.setMoveCamera(false); // Arrêtez de déplacer la caméra
+                setIsCameraAuto(false); // Passez en mode manuel
+            }
+        }
+    });
 
-  // --- Camera --- //
+    // --- Camera --- //
 
-  // --- Animation de l'eau --- //
-  // Animation du shader material
-  useFrame(({ camera, clock }) => {
-    if (
-      eauExterieur.current &&
-      eauPiscine.current &&
-      eauExterieurCote.current &&
-      eauPiscineCote.current
-    ) {
-      eauExterieur.current.material.uniforms.uTime.value =
-        clock.getElapsedTime();
-      eauPiscine.current.material.uniforms.uTime.value = clock.getElapsedTime();
-      eauExterieurCote.current.material.uniforms.uTime.value =
-        clock.getElapsedTime();
-      eauPiscineCote.current.material.uniforms.uTime.value =
-        clock.getElapsedTime();
-    }
-    /*  console.log(camera.position); */
+    // --- Animation de l'eau --- //
+    // Animation du shader material
+    useFrame(({ camera, clock }) => {
+        if (
+            eauExterieur.current &&
+            eauPiscine.current &&
+            eauExterieurCote.current &&
+            eauPiscineCote.current
+        ) {
+            eauExterieur.current.material.uniforms.uTime.value = clock.getElapsedTime();
+            eauPiscine.current.material.uniforms.uTime.value = clock.getElapsedTime();
+            eauExterieurCote.current.material.uniforms.uTime.value = clock.getElapsedTime();
+            eauPiscineCote.current.material.uniforms.uTime.value = clock.getElapsedTime();
+        }
+        /*  console.log(camera.position); */
 
-    /*   if (cameraRef.current) {
+        /*   if (cameraRef.current) {
       camera.position.copy(cameraRef.current.position0);
       camera.lookAt(cameraRef.current.target);
     } */
 
-    /*  camera.position.copy(orbitControls.position0);
+        /*  camera.position.copy(orbitControls.position0);
     camera.lookAt(orbitControls.target); */
-  });
+    });
 
-  // Animations montée de l'eau
-  const [showCoteMeshes, setShowCoteMeshes] = useState(false);
+    // Animations montée de l'eau
+    const [showCoteMeshes, setShowCoteMeshes] = useState(false);
 
-  // Scenario
-  const [scenario, setScenario] = useState("A");
+    // Scenario
+    const [scenario, setScenario] = useState('A');
 
-  const animationNames = [
-    "eauExterieur0To80",
-    "eauPiscine0To80",
-    "eauPiscineCote0To80",
-    "eauExterieurCote0To80",
-  ];
+    const animationNames = [
+        'eauExterieur0To80',
+        'eauPiscine0To80',
+        'eauPiscineCote0To80',
+        'eauExterieurCote0To80',
+    ];
 
-  const animationsClips = [
-    useAnimations(animations, nodes.eau_exterieur),
-    useAnimations(animations, nodes.eau_piscine),
-    useAnimations(animations, nodes.eau_piscine_cote),
-    useAnimations(animations, nodes.eau_exterieur_cote),
-  ];
+    const animationsClips = [
+        useAnimations(animations, nodes.eau_exterieur),
+        useAnimations(animations, nodes.eau_piscine),
+        useAnimations(animations, nodes.eau_piscine_cote),
+        useAnimations(animations, nodes.eau_exterieur_cote),
+    ];
 
-  // Animation de l'eau avec useEffect pour gérer les déclenchements
-  useEffect(() => {
-    // Ne procéder que si isWaterMoving est true pour éviter les déclenchements inutiles.
-    if (!props.isWaterMoving) return;
+    // Animation de l'eau avec useEffect pour gérer les déclenchements
+    useEffect(() => {
+        // Ne procéder que si isWaterMoving est true pour éviter les déclenchements inutiles.
+        if (!props.isWaterMoving) return;
 
-    // Afficher les côtes de l'eau qui sont cachées par défaut
-    setShowCoteMeshes(true);
+        // Afficher les côtes de l'eau qui sont cachées par défaut
+        setShowCoteMeshes(true);
 
-    // Déterminer si l'animation doit être inversée en fonction de isWaterMovingUp
-    const reverse = !props.isWaterMovingUp;
+        // Déterminer si l'animation doit être inversée en fonction de isWaterMovingUp
+        const reverse = !props.isWaterMovingUp;
 
-    let timeoutId;
+        let timeoutId;
 
-    if (props.isWaterMoving && props.isWaterMovingUp) {
-      /* console.log("Animation démarrée", props.isWaterMoving); */
-      animationNames.forEach((name, index) => {
-        startAnimation(name, animationsClips[index], reverse);
-      });
+        if (props.isWaterMoving && props.isWaterMovingUp) {
+            /* console.log("Animation démarrée", props.isWaterMoving); */
+            animationNames.forEach((name, index) => {
+                startAnimation(name, animationsClips[index], reverse);
+            });
 
-      timeoutId = window.setTimeout(() => {
-        props.toggleScenario(true);
-        props.toggleAnimation(false);
+            timeoutId = window.setTimeout(() => {
+                props.toggleScenario(true);
+                props.toggleAnimation(false);
 
-        props.toggleTextures(true);
-        if (waterMaterialRef.current) {
-          waterMaterialRef.current.uniforms.uDepthColor.value.set("#b0a997");
-          waterMaterialRef.current.uniforms.uSurfaceColor.value.set("#e3cfcf");
+                props.toggleTextures(true);
+                if (waterMaterialRef.current) {
+                    waterMaterialRef.current.uniforms.uDepthColor.value.set('#b0a997');
+                    waterMaterialRef.current.uniforms.uSurfaceColor.value.set('#e3cfcf');
+                }
+                if (waterMaterialSideRef.current) {
+                    waterMaterialSideRef.current.uniforms.uDepthColor.value.set('#b0a997');
+                    waterMaterialSideRef.current.uniforms.uSurfaceColor.value.set('#e3cfcf');
+                }
+            }, 5000);
+        } else if (props.isWaterMoving && !props.isWaterMovingUp) {
+            animationNames.forEach((name, index) => {
+                startAnimation(name, animationsClips[index], reverse);
+            });
+
+            timeoutId = window.setTimeout(() => {
+                props.toggleAnimation();
+                setShowCoteMeshes(false);
+                // props.toggleReset();
+                /*   props.toggleTextures(); */
+            }, 5000);
         }
-        if (waterMaterialSideRef.current) {
-          waterMaterialSideRef.current.uniforms.uDepthColor.value.set(
-            "#b0a997"
-          );
-          waterMaterialSideRef.current.uniforms.uSurfaceColor.value.set(
-            "#e3cfcf"
-          );
-        }
-      }, 5000);
-    } else if (props.isWaterMoving && !props.isWaterMovingUp) {
-      animationNames.forEach((name, index) => {
-        startAnimation(name, animationsClips[index], reverse);
-      });
 
-      timeoutId = window.setTimeout(() => {
-        props.toggleAnimation();
-        setShowCoteMeshes(false);
-        // props.toggleReset();
-        /*   props.toggleTextures(); */
-      }, 5000);
-    }
-
-    /* if (props.isReset) {
+        /* if (props.isReset) {
       setShowCoteMeshes(false);
     } */
-    return () => {
-      window.clearTimeout(timeoutId);
-    };
-  }, [props.isWaterMoving, props.isWaterMovingUp, animationsClips]);
+        return () => {
+            window.clearTimeout(timeoutId);
+        };
+    }, [props.isWaterMoving, props.isWaterMovingUp, animationsClips]);
 
-  // --- Animation de l'eau --- //
+    // --- Animation de l'eau --- //
 
-  // --- Loading des objets --- //
+    // --- Loading des objets --- //
 
-  // useEffect(() => {
-  //     if (nodes && Object.keys(nodes).length > 0 && animations) {
-  //         setIsLoaded(true);
-  //     }
-  // }, [nodes, animations]);
+    // useEffect(() => {
+    //     if (nodes && Object.keys(nodes).length > 0 && animations) {
+    //         setIsLoaded(true);
+    //     }
+    // }, [nodes, animations]);
 
-  // Function d'aide pour obtenir la référence pour un certain clé
-  function getRefForKey(key) {
-    switch (key) {
-      case "eau_exterieur":
-        return eauExterieur;
-      case "eau_exterieur_cote":
-        return eauExterieurCote;
-      case "eau_piscine":
-        return eauPiscine;
-      case "eau_piscine_cote":
-        return eauPiscineCote;
-      default:
-        return null; // Case de défaut
+    // Function d'aide pour obtenir la référence pour un certain clé
+    function getRefForKey(key) {
+        switch (key) {
+            case 'eau_exterieur':
+                return eauExterieur;
+            case 'eau_exterieur_cote':
+                return eauExterieurCote;
+            case 'eau_piscine':
+                return eauPiscine;
+            case 'eau_piscine_cote':
+                return eauPiscineCote;
+            default:
+                return null; // Case de défaut
+        }
     }
-  }
-  // --- Loading des objets --- //
+    // --- Loading des objets --- //
 
-  // --- Render --- //
-  return (
-    <>
-      {/*  <BakeShadows /> */}
-      {/*   <SoftShadows size={5} samples={20} focus={0} /> */}
-      <OrbitControls
-        ref={orbitControlsRef}
-        enableDamping
-        dampingFactor={0.25}
-        minPolarAngle={0}
-        maxPolarAngle={Math.PI / 2}
-        minAzimuthAngle={-Infinity}
-        maxAzimuthAngle={Infinity}
-        maxDistance={20}
-        enabled={!isCameraAuto}
-      />
+    // --- Render --- //
+    return (
+        <>
+            {/*  <BakeShadows /> */}
+            {/*   <SoftShadows size={5} samples={20} focus={0} /> */}
+            <OrbitControls
+                ref={orbitControlsRef}
+                enableDamping
+                dampingFactor={0.25}
+                minPolarAngle={0}
+                maxPolarAngle={Math.PI / 2}
+                minAzimuthAngle={-Infinity}
+                maxAzimuthAngle={Infinity}
+                maxDistance={20}
+                enabled={!isCameraAuto}
+            />
 
-      <directionalLight
-        ref={directionalLight}
-        position={sunPosition}
-        intensity={2}
-        castShadow
-        shadow-mapSize={[1024, 1024]}
-        shadow-camera-near={1}
-        shadow-camera-far={20}
-        shadow-camera-top={10}
-        shadow-camera-right={10}
-        shadow-camera-bottom={-10}
-        shadow-camera-left={-10}
-        color={0xffd0b5}
-      />
-      <Sky sunPosition={sunPosition} />
-      {/* Affichage du modèle */}
-      {Object.keys(nodes).map((key) => {
-        // Exclure la scène du rendu et les salissures
-        if (key === "Scene") {
-          return null;
-        }
-        // Utiliser shouldShowNode pour déterminer si le nœud doit être affiché
-        if (!shouldShowNode(key)) {
-          return null;
-        }
-        if (
-          key === "structure_salissure_interieure" ||
-          key === "structure_salissure_exterieure" ||
-          key === "exterieur_flaques_eau" ||
-          key === "exterieur_flaques_fioul"
-        ) {
-          if (!props.changeTextures) {
-            return null;
-          } else {
-            return <primitive key={key} object={nodes[key]} />;
-          }
-        }
-
-        // Gérer les cas spéciaux d'eau
-        if (
-          key === "eau_exterieur" ||
-          key === "eau_piscine" ||
-          key === "eau_exterieur_cote" ||
-          key === "eau_piscine_cote"
-        ) {
-          return (
-            <React.Fragment key={key}>
-              <primitive
-                key={`${key}-firstChild`}
-                object={nodes[key]}
-                ref={getRefForKey(key)} // Use the helper function to determine the ref
-                visible={
-                  key === "eau_piscine" || key === "eau_piscine_cote"
-                    ? true
-                    : showCoteMeshes
+            <directionalLight
+                ref={directionalLight}
+                position={sunPosition}
+                intensity={2}
+                castShadow
+                shadow-mapSize={[1024, 1024]}
+                shadow-camera-near={1}
+                shadow-camera-far={20}
+                shadow-camera-top={10}
+                shadow-camera-right={10}
+                shadow-camera-bottom={-10}
+                shadow-camera-left={-10}
+                color={0xffd0b5}
+            />
+            <Sky sunPosition={sunPosition} />
+            {/* Affichage du modèle */}
+            {Object.keys(nodes).map((key) => {
+                // Exclure la scène du rendu et les salissures
+                if (key === 'Scene') {
+                    return null;
                 }
-              >
-                <shaderMaterial
-                  attach="material"
-                  ref={
-                    key === "eau_exterieur" || key === "eau_piscine"
-                      ? waterMaterialRef
-                      : waterMaterialSideRef
-                  }
-                  args={
-                    key === "eau_exterieur" || key === "eau_piscine"
-                      ? [data]
-                      : [data2]
-                  }
-                />
-              </primitive>
-            </React.Fragment>
-          );
-        } else if (
-          key === "salon_sol" ||
-          key === "cuisine_sol" ||
-          key === "sdb_sol" ||
-          key === "exterieur_terrain"
-        ) {
-          return <primitive key={key} object={nodes[key]} receiveShadow />;
-        }
+                // Utiliser shouldShowNode pour déterminer si le nœud doit être affiché
+                if (!shouldShowNode(key)) {
+                    return null;
+                }
+                if (
+                    key === 'structure_salissure_interieure' ||
+                    key === 'structure_salissure_exterieure' ||
+                    key === 'exterieur_flaques_eau' ||
+                    key === 'exterieur_flaques_fioul'
+                ) {
+                    if (!props.changeTextures) {
+                        return null;
+                    } else {
+                        return (
+                            <primitive
+                                key={key}
+                                object={nodes[key]}
+                            />
+                        );
+                    }
+                }
 
-        // Cas par défaut pour les autres nœuds
-        return (
-          <primitive key={key} object={nodes[key]} castShadow receiveShadow />
-        );
-      })}
-      <mesh
-        geometry={overlayGeometry}
-        material={overlayMaterial}
-        ref={overlayMaterialRef}
-      />
-    </>
-  );
+                // Gérer les cas spéciaux d'eau
+                if (
+                    key === 'eau_exterieur' ||
+                    key === 'eau_piscine' ||
+                    key === 'eau_exterieur_cote' ||
+                    key === 'eau_piscine_cote'
+                ) {
+                    return (
+                        <React.Fragment key={key}>
+                            <primitive
+                                key={`${key}-firstChild`}
+                                object={nodes[key]}
+                                ref={getRefForKey(key)} // Use the helper function to determine the ref
+                                visible={
+                                    key === 'eau_piscine' || key === 'eau_piscine_cote'
+                                        ? true
+                                        : showCoteMeshes
+                                }
+                            >
+                                <shaderMaterial
+                                    attach='material'
+                                    ref={
+                                        key === 'eau_exterieur' || key === 'eau_piscine'
+                                            ? waterMaterialRef
+                                            : waterMaterialSideRef
+                                    }
+                                    args={
+                                        key === 'eau_exterieur' || key === 'eau_piscine'
+                                            ? [data]
+                                            : [data2]
+                                    }
+                                />
+                            </primitive>
+                        </React.Fragment>
+                    );
+                } else if (
+                    key === 'salon_sol' ||
+                    key === 'cuisine_sol' ||
+                    key === 'sdb_sol' ||
+                    key === 'exterieur_terrain'
+                ) {
+                    return (
+                        <primitive
+                            key={key}
+                            object={nodes[key]}
+                            receiveShadow
+                        />
+                    );
+                }
+
+                // Cas par défaut pour les autres nœuds
+                return (
+                    <primitive
+                        key={key}
+                        object={nodes[key]}
+                        castShadow
+                        receiveShadow
+                    />
+                );
+            })}
+            <mesh
+                geometry={overlayGeometry}
+                material={overlayMaterial}
+                ref={overlayMaterialRef}
+            />
+        </>
+    );
 }
 
 export default Scene;
