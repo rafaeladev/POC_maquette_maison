@@ -1,361 +1,362 @@
-@import url('https://fonts.googleapis.com/css2?family=Barlow:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Barlow:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap");
 
 .barlow-medium {
-    font-family: 'Barlow', sans-serif;
-    font-weight: 500;
-    font-style: normal;
+  font-family: "Barlow", sans-serif;
+  font-weight: 500;
+  font-style: normal;
 }
 
 :root {
-    /* Déclaration des couleurs */
-    --color-yellow: #ffe600;
-    --color-black: #000000;
-    --color-white: #ffffff;
-    --color-teal-1: #01a9af;
-    --color-teal-2: #34babf;
-    --color-teal-3: #80d4d7;
-    --color-light-teal: #cceeef;
-    --color-orange: #f8a941;
+  /* Déclaration des couleurs */
+  --color-yellow: #ffe600;
+  --color-black: #000000;
+  --color-white: #ffffff;
+  --color-teal-1: #01a9af;
+  --color-teal-2: #34babf;
+  --color-teal-3: #80d4d7;
+  --color-light-teal: #cceeef;
+  --color-orange: #f8a941;
 
-    /* Déclaration des types de police */
-    --font-family-primary: 'Barlow', sans-serif;
-    --font-weight-light: 300;
-    --font-weight-regular: 400;
-    --font-weight-medium: 600;
-    --font-weight-bold: 700;
+  /* Déclaration des types de police */
+  --font-family-primary: "Barlow", sans-serif;
+  --font-weight-light: 300;
+  --font-weight-regular: 400;
+  --font-weight-medium: 600;
+  --font-weight-bold: 700;
 
-    /* Déclaration des tailles de police */
-    --font-size-h1: 24px;
-    --font-size-p: 14px;
-    --font-size-cta: 14px;
-    --font-size-cta-2: 16px;
+  /* Déclaration des tailles de police */
+  --font-size-h1: 24px;
+  --font-size-p: 14px;
+  --font-size-cta: 14px;
+  --font-size-cta-2: 16px;
 
-    /* Déclaration des borders */
-    --border-radius: 2.85rem;
-    --round-button-size: 2.86rem;
-    --round-button-size-small: 2rem;
+  /* Déclaration des borders */
+  --border-radius: 2.85rem;
+  --round-button-size: 2.86rem;
+  --round-button-size-small: 2rem;
 }
 
 * {
-    margin: 0;
-    padding: 0;
+  margin: 0;
+  padding: 0;
 }
 
 html,
 body,
 main,
 #root {
-    background-color: black;
-    width: 100%;
-    height: 100%;
-    font-size: var(--font-size-p);
+  background-color: black;
+  width: 100%;
+  height: 100%;
+  font-size: var(--font-size-p);
 }
 
 p {
-    font-size: var(--font-size-p);
+  font-size: var(--font-size-p);
 }
 
 html,
 body {
-    overflow: hidden;
-    font-family: var(--font-family-primary);
+  overflow: hidden;
+  font-family: var(--font-family-primary);
 }
 
 .webgl {
-    position: fixed;
-    top: 0;
-    left: 0;
-    outline: none;
-    width: 100%;
-    height: 100%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  outline: none;
+  width: 100%;
+  height: 100%;
 }
 
 /* Container HTML devant WebGL */
 .scenario_list {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.2rem;
-    justify-content: space-between;
-    width: 100%;
-    height: 100%;
-    z-index: 100;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2rem;
+  justify-content: space-between;
+  width: 100%;
+  height: 100%;
+  z-index: 100;
 }
 .point {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    z-index: 100;
-    width: 20px;
-    height: 100px;
-    cursor: pointer;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 100;
+  width: 20px;
+  height: 100px;
+  cursor: pointer;
 }
 
 .button_white {
-    color: #000000;
-    background-color: #ffffff;
+  color: #000000;
+  background-color: #ffffff;
 }
 
 .scenario_title {
-    color: #000000;
-    font-weight: bold;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    transition: all 0.3s ease-in-out;
-    z-index: 100;
-    text-align: center;
-    width: 200px;
-    height: 50px;
+  color: #000000;
+  font-weight: bold;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: all 0.3s ease-in-out;
+  z-index: 100;
+  text-align: center;
+  width: 200px;
+  height: 50px;
 }
 
 /* Menu bar */
 .scenario_animation {
-    display: flex;
-    justify-content: center;
-    background-color: white;
-    border-radius: 2.85rem;
-    padding: 0.28rem;
-    gap: 0.5rem;
-    margin-bottom: 0.71rem;
-    z-index: 0;
+  display: flex;
+  justify-content: center;
+  background-color: white;
+  border-radius: 2.85rem;
+  padding: 0.28rem;
+  gap: 0.5rem;
+  margin-bottom: 0.71rem;
+  z-index: 0;
 }
 
 /* Title bar*/
 .title_bar {
-    width: 100%;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    z-index: 0;
-    margin-top: 0.71rem;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 0;
+  margin-top: 0.71rem;
 }
 
 .title_bar_scenario {
-    background-color: var(--color-white);
-    color: var(--color-teal-1);
-    font-weight: var(--font-weight-medium);
-    font-size: 1.14rem;
-    padding: 0.285rem;
-    border-radius: 2.85rem;
-    width: 2.285rem;
-    height: 2.285rem;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-left: 1.42rem;
+  background-color: var(--color-white);
+  color: var(--color-teal-1);
+  font-weight: var(--font-weight-medium);
+  font-size: 1.14rem;
+  padding: 0.285rem;
+  border-radius: 2.85rem;
+  width: 2.285rem;
+  height: 2.285rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-left: 1.42rem;
 }
 
 .title_bar_sceneName {
-    color: var(--color-white);
-    font-weight: var(--font-weight-medium);
-    font-size: 1rem;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+  color: var(--color-white);
+  font-weight: var(--font-weight-medium);
+  font-size: 1rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .title_bar_closeIcon {
-    background-color: var(--color-teal-1);
-    color: var(--color-white);
-    font-weight: var(--font-weight-medium);
-    font-size: 1.14rem;
-    padding: 0.285rem;
-    border-radius: 2.85rem;
-    width: 2.285rem;
-    height: 2.285rem;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-right: 1.42rem;
+  background-color: var(--color-teal-1);
+  color: var(--color-white);
+  font-weight: var(--font-weight-medium);
+  font-size: 1.14rem;
+  padding: 0.285rem;
+  border-radius: 2.85rem;
+  width: 2.285rem;
+  height: 2.285rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-right: 1.42rem;
 }
 
 .title_bar_closeIcon:hover {
-    background-color: var(--color-teal-3);
+  background-color: var(--color-teal-3);
 }
 
 .title_bar_closeIcon svg {
-    width: 1.5rem;
-    height: 1.5rem;
+  width: 1.5rem;
+  height: 1.5rem;
 }
 
 .scenario_list_buttons {
-    z-index: 10;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 0.64rem;
-    margin-bottom: 0.71rem;
+  z-index: 10;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.64rem;
+  margin-bottom: 0.71rem;
 }
 
 /*List of buttons*/
 .scenario_container {
-    width: calc(100% - 1.42rem - 1.42rem);
-    margin-inline: 1.42rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+  width: calc(100% - 1.42rem - 1.42rem);
+  margin-inline: 1.42rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 /*Menu button*/
 button {
-    z-index: 100;
-    font-family: 'Barlow', sans-serif;
+  z-index: 100;
+  font-family: "Barlow", sans-serif;
 
-    font-weight: var(--font-weight-medium);
-    cursor: pointer;
-    border: none;
-    transition: all 0.3s ease-in-out;
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+  border: none;
+  transition: all 0.3s ease-in-out;
 }
 
 .button_animation_menu {
-    font-size: 1rem;
-    color: var(--color-white);
-    background-color: var(--color-teal-1);
-    font-weight: var(--font-weight-medium);
-    border-radius: 2.85rem;
-    height: 2.86rem;
-    width: 12.71rem;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 1.14rem;
-    line-height: 1.2rem;
-    gap: 0.286rem;
+  font-size: 1rem;
+  color: var(--color-white);
+  background-color: var(--color-teal-1);
+  font-weight: var(--font-weight-medium);
+  border-radius: 2.85rem;
+  height: 2.86rem;
+  width: 12.71rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 1.14rem;
+  line-height: 1.2rem;
+  gap: 0.286rem;
 }
 
 .button_animation_menu:hover {
-    background-color: var(--color-teal-3);
-    color: white;
+  background-color: var(--color-teal-3);
+  color: white;
 }
 
 .button_animation_menu img {
-    width: 1.71rem;
-    height: 1.71rem;
+  width: 1.71rem;
+  height: 1.71rem;
 }
 
 /* Reset button */
 .button_reset_menu {
-    background-color: var(--color-white);
-    color: var(--color-teal-1);
-    border-radius: var(--border-radius);
-    width: var(--round-button-size);
-    height: var(--round-button-size);
-    display: flex;
-    justify-content: center;
-    align-items: center;
+  background-color: var(--color-white);
+  color: var(--color-teal-1);
+  border-radius: var(--border-radius);
+  width: var(--round-button-size);
+  height: var(--round-button-size);
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 .button_reset_menu img {
-    width: 1.71rem;
-    height: 1.71rem;
+  width: 1.71rem;
+  height: 1.71rem;
 }
 .button_reset_menu:hover {
-    background-color: var(--color-teal-3);
+  background-color: var(--color-teal-3);
 }
 
 .button_reset_menu:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 /* Look around button */
 .button_look_around {
-    background-color: var(--color-white);
-    color: var(--color-teal-1);
-    border-radius: var(--border-radius);
-    width: var(--round-button-size-small);
-    height: var(--round-button-size-small);
-    display: flex;
-    justify-content: center;
-    align-items: center;
+  background-color: var(--color-white);
+  color: var(--color-teal-1);
+  border-radius: var(--border-radius);
+  width: var(--round-button-size-small);
+  height: var(--round-button-size-small);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10;
 }
 
 .button_look_around svg {
-    width: 1rem;
-    height: 1.6rem;
+  width: 1rem;
+  height: 1.6rem;
 }
 
 /* Correction button */
 .scenario_correction {
-    display: flex;
-    gap: 0.5rem;
-    transition: all 0.3s ease-in-out;
+  display: flex;
+  gap: 0.5rem;
+  transition: all 0.3s ease-in-out;
 }
 
 button:hover {
-    background-color: var(--color-teal-1);
-    color: white;
+  background-color: var(--color-teal-1);
+  color: white;
 }
 
 button:disabled {
-    color: #777777;
-    cursor: not-allowed;
+  color: #777777;
+  cursor: not-allowed;
 }
 
 .button:disabled .label {
-    background-color: #cccccc;
-    color: #666666;
-    cursor: not-allowed;
+  background-color: #cccccc;
+  color: #666666;
+  cursor: not-allowed;
 }
 
 .point-1 {
-    left: 25%;
+  left: 25%;
 }
 
 .point .label {
-    position: absolute;
-    top: -20px;
-    left: -20px;
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    background: #00000077;
-    border: 1px solid #ffffff77;
-    color: #ffffff;
-    text-align: center;
-    line-height: 40px;
-    font-weight: 100;
-    transform: scale(1);
-    transition: transform 0.3s;
+  position: absolute;
+  top: -20px;
+  left: -20px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #00000077;
+  border: 1px solid #ffffff77;
+  color: #ffffff;
+  text-align: center;
+  line-height: 40px;
+  font-weight: 100;
+  transform: scale(1);
+  transition: transform 0.3s;
 }
 
 .point .text {
-    position: absolute;
-    top: 30px;
-    left: -120px;
-    width: 200px;
-    padding: 20px;
-    border-radius: 4px;
-    background: #00000077;
-    border: 1px solid #ffffff77;
-    color: #ffffff;
-    line-height: 1.3em;
-    font-weight: 100;
-    opacity: 0;
-    transition: opacity 0.3s;
-    pointer-events: none;
+  position: absolute;
+  top: 30px;
+  left: -120px;
+  width: 200px;
+  padding: 20px;
+  border-radius: 4px;
+  background: #00000077;
+  border: 1px solid #ffffff77;
+  color: #ffffff;
+  line-height: 1.3em;
+  font-weight: 100;
+  opacity: 0;
+  transition: opacity 0.3s;
+  pointer-events: none;
 }
 
 .point:hover .text {
-    opacity: 1;
+  opacity: 1;
 }
 
 .point.visible .label {
-    transform: scale(1, 1);
+  transform: scale(1, 1);
 }
 
 .loading-spinner {
-    text-align: center;
-    padding: 20px;
-    width: 100%;
-    height: 100vh;
-    margin: auto;
-    display: flex;
-    flex-direction: column;
-    gap: 2rem;
-    color: white;
-    justify-content: center;
-    align-items: center;
-    background-color: black;
-    z-index: 100%;
+  text-align: center;
+  padding: 20px;
+  width: 100%;
+  height: 100vh;
+  margin: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  color: white;
+  justify-content: center;
+  align-items: center;
+  background-color: black;
+  z-index: 100%;
 }

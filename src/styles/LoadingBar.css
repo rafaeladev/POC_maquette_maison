@@ -3,10 +3,11 @@
   position: absolute;
   width: 100%;
   height: 100%;
-  background-color: black;
+  background-color: var(--color-teal-1);
   z-index: 1;
   opacity: 1;
   transition: opacity 1s ease-out; /* Transition douce pour l'opacité */
+  z-index: 100;
 }
 
 .loading-container.ended {

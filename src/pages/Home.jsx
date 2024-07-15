@@ -37,10 +37,6 @@ function Home() {
   const [moveCamera, setMoveCamera] = useState(true);
   const [menuButtonClick, setMenuButtonClick] = useState(false);
 
-  // Texture change
-  const [changeTextures, setChangeTextures] = useState(false);
-  const [resetTextures, setResetTextures] = useState(false);
-
   // Change of states for the water animation
   const toggleWaterMovingUp = () => {
     setIsWaterMovingUp((prev) => !prev);
@@ -60,49 +56,70 @@ function Home() {
     setIsReset((prev) => !prev);
   };
 
-  // Change of states for the textures
-  const toggleTextures = () => {
-    setChangeTextures((prev) => !prev);
-  };
-
   // Change of states for the camera position
   const toggleCameraPosition = () => {
     setMoveCamera((prev) => !prev);
   };
 
   // Function do handle the change of positions for the camera
-  const handleCameraPosition = (location) => {
+  const cameraPositions = [
+    {
+      location: "Maison globale",
+      position: new Vector3(-12.08, 5.28, 9.7),
+      target: new Vector3(0, 0, 0),
+    },
+    {
+      location: "Cuisine",
+      position: new Vector3(5.94, 1.85, 4.13),
+      target: new Vector3(5, 1, 0),
+    },
+    {
+      location: "Salon",
+      position: new Vector3(-0.88, 1, 1.25),
+      target: new Vector3(3, 0.34, -3.2),
+    },
+    {
+      location: "Salle de bain",
+      position: new Vector3(3.65, 1.25, -5.42),
+      target: new Vector3(8, 0, 0),
+    },
+    {
+      location: "Jardin",
+      position: new Vector3(-7.12, 3.64, 9.33),
+      target: new Vector3(3, 0.34, -3.2),
+    },
+  ];
+
+  const [currentPositionIndex, setCurrentPositionIndex] = useState(0);
+
+  const handleCameraPositionChange = (direction) => {
     setMoveCamera(true); // Passez en mode automatique
     setMenuButtonClick(true);
-    if (location === "cuisine") {
-      setCameraPosition(new Vector3(5.94, 1.85, 4.13));
-      setCameraTarget(new Vector3(5, 1, 0));
-    } else if (location === "salon") {
-      setCameraPosition(new Vector3(-0.88, 1, 1.25));
-      setCameraTarget(new Vector3(3, 0.34, -3.2));
-    } else if (location === "sdb") {
-      setCameraPosition(new Vector3(3.65, 1.25, -5.42));
-      setCameraTarget(new Vector3(8, 0, 0));
-    } else if (location === "jardin") {
-      setCameraPosition(new Vector3(-7.12, 3.64, 9.33));
-      setCameraTarget(new Vector3(3, 0.34, -3.2));
+
+    let newIndex = currentPositionIndex + direction;
+
+    if (newIndex < 0) {
+      newIndex = cameraPositions.length - 1;
+    } else if (newIndex >= cameraPositions.length) {
+      newIndex = 0;
     }
+
+    setCurrentPositionIndex(newIndex);
+    setCameraPosition(cameraPositions[newIndex].position);
+    setCameraTarget(cameraPositions[newIndex].target);
   };
 
   // Function to reset of the animations
   const handleReset = () => {
     setIsReset(true);
-    setIsScenarioChanged();
+    toggleScenario(false);
     setIsWaterMoving();
     setIsWaterMovingUp();
     setResetKey((prevKey) => prevKey + 1); // Change the key to force a re-render
 
-    setChangeTextures(false);
-    setResetTextures(true);
-
+    console.log(isScenarioChanged);
     setTimeout(() => {
       setIsReset(false);
-      setResetTextures(false);
     }, 200); // Reset the reset state after a short delay to allow re-rendering
   };
 
@@ -138,9 +155,7 @@ function Home() {
               isWaterMovingUp={isWaterMovingUp}
               toggleReset={toggleReset}
               isReset={isReset}
-              resetTextures={resetTextures}
-              changeTextures={changeTextures}
-              toggleTextures={toggleTextures}
+              resetKey={resetKey}
               cameraPosition={cameraPosition}
               cameraTarget={cameraTarget}
               moveCamera={moveCamera}
@@ -160,7 +175,8 @@ function Home() {
           handleReset={handleReset}
           isReset={isReset}
           toggleReset={toggleReset}
-          handleCameraPosition={handleCameraPosition}
+          handleCameraPositionChange={handleCameraPositionChange}
+          titleScenario={cameraPositions[currentPositionIndex].location}
         />
       </>
       {/* </Suspense> */}

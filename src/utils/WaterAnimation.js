@@ -2,6 +2,7 @@ import { LoopOnce } from "three";
 
 // Fonction pour démarrer l'animation de l'eau
 export const startAnimation = (name, animationClip, reverse = false) => {
+  console.log("startAnimation:", name, animationClip);
   const action = animationClip.actions[name];
   if (action) {
     action.reset(); // Réinitialise l'état de l'action
