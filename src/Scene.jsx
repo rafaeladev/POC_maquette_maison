@@ -14,6 +14,7 @@ import { useFrame, useLoader } from "@react-three/fiber";
 
 // imports Three.js
 import * as THREE from "three";
+import { Sprite, SpriteMaterial } from "three";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader.js";
 
@@ -40,7 +41,8 @@ const DisableRender = () => useFrame(() => null, 1000);
 
 // Fonction pour ajouter des shadows
 const enableShadows = (object) => {
-  /*  let i = 0;
+  console.log("enableShadows called");
+  let i = 0;
   object.traverse((child) => {
     if (child.isMesh) {
       if (
@@ -58,7 +60,7 @@ const enableShadows = (object) => {
       child.receiveShadow = true;
     }
     i = i + 1;
-  }); */
+  });
 };
 
 function Scene(props) {
@@ -110,7 +112,7 @@ function Scene(props) {
     sunPosition: { value: [-3.9, 9.9, 10.1], step: 0.1 },
     turbidity: { value: 4, min: 0, max: 20, step: 0.1 },
     rayleigh: { value: 3, min: 0, max: 10, step: 0.1 },
-    mieCoefficient: { value: 0.09, min: 0, max: 1, step: 0.01 },
+    mieCoefficient: { value: 0.33, min: 0, max: 1, step: 0.01 },
     mieDirectionalG: { value: 1, min: 0, max: 1, step: 0.01 },
     distance: { value: 450000, min: 0, max: 1000000, step: 100 },
   });
@@ -144,30 +146,7 @@ function Scene(props) {
   const waterMaterialRef = useRef();
   const waterMaterialSideRef = useRef();
   const sceneRef = useRef();
-
-  // -- Overlay material -- //
-  const overlayGeometry = new THREE.PlaneGeometry(2, 2, 1, 1);
-  const overlayMaterial = new THREE.ShaderMaterial({
-    transparent: true,
-    uniforms: {
-      uAlpha: { value: 0.15 },
-    },
-    vertexShader: `
-               void main()
-               {
-                  gl_Position = vec4(position, 1.0);
-               }
-           `,
-    fragmentShader: `
-               uniform float uAlpha;
-   
-               void main()
-               {
-                   gl_FragColor = vec4(0.0, 0.0, 0.0, uAlpha);
-               }
-           `,
-  });
-  // -- Overlay material -- //
+  const spriteRef = useRef();
 
   // --- Model --- //
 
@@ -216,76 +195,58 @@ function Scene(props) {
 
   // Scenario
   const scenario = useStore((state) => state.scenario);
-  console.log("scenario : ", scenario);
 
-  const maquette_scenario_a_avant = nodes.maquette_scenario_a_avant;
-  const maquette_scenario_a_apres = nodes.maquette_scenario_a_apres;
-  const maquette_scenario_b_avant = nodes.maquette_scenario_b_avant;
-  const maquette_scenario_b_apres = nodes.maquette_scenario_b_apres;
-  const maquette_scenario_c_avant = nodes.maquette_scenario_c_avant;
-  const maquette_scenario_c_apres = nodes.maquette_scenario_c_apres;
+  const {
+    maquette_scenario_a_avant,
+    maquette_scenario_a_apres,
+    maquette_scenario_b_avant,
+    maquette_scenario_b_apres,
+    maquette_scenario_c_avant,
+    maquette_scenario_c_apres,
+  } = nodes;
 
-  // Force reload when pathname changes
-  const [sceneAvant, setSceneAvant] = useState(getSceneForScenarioAvant("A"));
-  const [sceneApres, setSceneApres] = useState(getSceneForScenarioApres("A"));
-  useEffect(() => {
-    setResetKey((prevKey) => prevKey + 1);
-    setSceneAvant(getSceneForScenarioAvant(scenario));
-    setSceneApres(getSceneForScenarioApres(scenario));
-  }, [scenario]); // Force re-render when pathname changes
-
-  function getSceneForScenarioAvant(key) {
-    switch (key) {
-      case "A":
-        return maquette_scenario_a_avant;
-      case "B":
-        return maquette_scenario_b_avant;
-      case "C":
-        return maquette_scenario_c_avant;
-      default:
-        return null; // Case de défaut
-    }
-  }
-
-  function getSceneForScenarioApres(key) {
-    switch (key) {
-      case "A":
-        return maquette_scenario_a_apres;
-      case "B":
-        return maquette_scenario_b_apres;
-      case "C":
-        return maquette_scenario_c_apres;
-      default:
-        return null; // Case de défaut
-    }
-  }
-
-  const numberOfChildren = maquette_scenario_a_avant.children.length;
-
-  useEffect(() => {
-    if (!props.isScenarioChanged) {
-      enableShadows(getSceneForScenarioAvant(props.scenario), numberOfChildren);
-    } else {
-      enableShadows(getSceneForScenarioApres(props.scenario), numberOfChildren);
-    }
-  }, [props.isScenarioChanged, props.scenario]);
-
-  /*   const gltf = useLoader(
-    GLTFLoader,
-    "./model/Maquette_v9_compressed.glb",
-    (loader) => {
-      const dracoLoader = new DRACOLoader();
-      dracoLoader.setDecoderPath("./draco/"); // Assurez-vous que ce chemin est correct
-      loader.setDRACOLoader(dracoLoader);
-    }
+  const scenariosAvant = useMemo(
+    () => ({
+      A: maquette_scenario_a_avant,
+      B: maquette_scenario_b_avant,
+      C: maquette_scenario_c_avant,
+    }),
+    [
+      maquette_scenario_a_avant,
+      maquette_scenario_b_avant,
+      maquette_scenario_c_avant,
+    ]
   );
 
-  const nodes = useMemo(() => gltf.nodes, [gltf]);
-  console.log(nodes);
-  const animations = useMemo(() => gltf.animations, [gltf]); */
+  const scenariosApres = useMemo(
+    () => ({
+      A: maquette_scenario_a_apres,
+      B: maquette_scenario_b_apres,
+      C: maquette_scenario_c_apres,
+    }),
+    [
+      maquette_scenario_a_apres,
+      maquette_scenario_b_apres,
+      maquette_scenario_c_apres,
+    ]
+  );
 
-  /*   const [damagedNodes, setDamagedNodes] = useState({});
-  const [cleanNodes, setCleanNodes] = useState({}); */
+  const sceneAvant = useMemo(
+    () => scenariosAvant[scenario],
+    [scenariosAvant, scenario]
+  );
+  const sceneApres = useMemo(
+    () => scenariosApres[scenario],
+    [scenariosApres, scenario]
+  );
+
+  // Force reload when pathname changes
+  useEffect(() => {
+    setResetKey((prevKey) => prevKey + 1);
+
+    const scene = props.isScenarioChanged ? sceneApres : sceneAvant;
+    enableShadows(scene);
+  }, [scenario, props.isScenarioChanged, sceneAvant, sceneApres]);
 
   // --- Model --- //
 
@@ -351,7 +312,7 @@ function Scene(props) {
         uSurfaceColor: { value: new THREE.Color(surfaceColor) },
         uColorOffset: { value: uColorOffset },
         uColorMultiplier: { value: uColorMultiplier },
-        uOpacity: { value: 0.8 },
+        uOpacity: { value: 1 },
       },
       fragmentShader: fragmentShaderSide,
       vertexShader,
@@ -371,6 +332,13 @@ function Scene(props) {
     ]
   );
   // --- Shader material --- //
+
+  // --- Sprite --- //
+  const map = new THREE.TextureLoader().load("/pictos/Check.svg");
+  const material = new THREE.SpriteMaterial({ map: map });
+  const sprite = new THREE.Sprite(material);
+
+  // --- Sprite --- //
 
   // --- Camera --- //
   const [smoothedCameraPosition] = useState(
@@ -471,14 +439,16 @@ function Scene(props) {
   // Animations montée de l'eau
   const [showCoteMeshes, setShowCoteMeshes] = useState(false);
 
-  const animationNames = [
-    "eau_exterieur_scenario_abc_montee",
-    "eau_exterieur_cote_scenario_abc_montee",
-    "eau_interieur_cote_scenario_a_montee",
-    "eau_interieur_scenario_a_montee",
-    "eau_piscine_cote_scenario_abc_montee",
-    "eau_piscine_scenario_abc_montee",
+  const getAnimationNames = (scenario) => [
+    `eau_exterieur_scenario_abc_montee`,
+    `eau_exterieur_cote_scenario_abc_montee`,
+    `eau_interieur_cote_scenario_${scenario.toLowerCase()}_montee`,
+    `eau_interieur_scenario_${scenario.toLowerCase()}_montee`,
+    `eau_piscine_cote_scenario_abc_montee`,
+    `eau_piscine_scenario_abc_montee`,
   ];
+
+  const animationNames = useMemo(() => getAnimationNames(scenario), [scenario]);
 
   const animationsClips = [
     useAnimations(animations, nodes.eau_exterieur),
@@ -569,7 +539,7 @@ function Scene(props) {
   return (
     <>
       {/*  {!inView && DisableRender()} */}
-      <BakeShadows />
+      {/*  <BakeShadows /> */}
       {/*   <SoftShadows size={5} samples={20} focus={0} /> */}
       <OrbitControls
         ref={orbitControlsRef}
@@ -672,6 +642,10 @@ function Scene(props) {
       })}
 
       <primitive object={nodes.maquette_plan} />
+
+      {/*    <sprite scale={[0.5, 0.5, 1]} position={[3, 1, -5.5]}>
+        <spriteMaterial map={map} />
+      </sprite> */}
 
       {props.inView && (
         <primitive

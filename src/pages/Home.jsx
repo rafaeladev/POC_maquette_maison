@@ -45,8 +45,6 @@ function Home() {
   };
   const { ref, inView } = useInView();
 
-  console.log("inView", inView);
-
   const toggleClose = () => {
     setClose((prev) => !prev);
   };

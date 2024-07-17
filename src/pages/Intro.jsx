@@ -6,23 +6,23 @@ import { useInView } from "react-intersection-observer";
 import Home from "./Home.jsx";
 
 import { IoClose } from "react-icons/io5";
+import TitleBar from "../components/TitleBar.jsx";
 
 function Intro() {
-  const navigate = useNavigate();
-
   const setScenario = useStore((state) => state.setScenario);
+  const setIsClose = useStore((state) => state.setIsClose);
+  const isClose = useStore((state) => state.isClose);
 
   const sendToScene = (selectedScenario) => {
     setScenario(selectedScenario);
-    /*  navigate("/home"); */
-    setClick(true);
+    setIsClose(false);
   };
 
   const [isClick, setClick] = React.useState(false);
 
   const handleWindowClose = () => {
     console.log("Window close button clicked");
-    setClick(false);
+    setIsClose(false);
     /*   window.setTimeout(() => {
       navigate("/");
     }, 100); */
@@ -45,7 +45,7 @@ function Intro() {
       <h1
         style={{
           width: "100%",
-          display: "flex",
+          display: isClose ? "flex" : "none",
           justifyContent: "center",
           margin: "0",
           color: "white",
@@ -56,7 +56,7 @@ function Intro() {
       <div
         style={{
           width: "100%",
-          display: "flex",
+          display: isClose ? "flex" : "none",
           justifyContent: "center",
         }}
       >
@@ -73,7 +73,7 @@ function Intro() {
 
       <div
         style={{
-          display: isClick ? "block" : "none",
+          display: isClose ? "none" : "block",
           width: "100%",
           height: "100%",
           position: "absolute",
@@ -83,9 +83,6 @@ function Intro() {
         }}
       >
         <Home />
-        <button className="title_bar_closeIcon" onClick={handleWindowClose}>
-          <IoClose />
-        </button>
       </div>
     </div>
   );

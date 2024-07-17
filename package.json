@@ -1,5 +1,5 @@
 {
-  "name": "threejs-journey-exercise",
+  "name": "threejs-papi-3d",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -16,7 +16,7 @@
     "@react-spring/three": "^9.7.3",
     "@react-three/drei": "^9.77.4",
     "@react-three/fiber": "^8.13.0",
-    "ar.js": "^2.2.2",
+    "aframe": "^1.6.0",
     "gsap": "3.12",
     "leva": "^0.9.35",
     "mind-ar": "^1.2.5",
@@ -32,6 +32,8 @@
     "three": "^0.153.0",
     "three-stdlib": "^2.30.0",
     "vercel": "^32.1.0",
-    "vite-plugin-glsl": "^1.1.2"
+    "vite-plugin-glsl": "^1.1.2",
+    "vite-plugin-svgr": "^4.2.0",
+    "zustand": "^4.5.4"
   }
 }

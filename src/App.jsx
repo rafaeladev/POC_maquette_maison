@@ -8,6 +8,7 @@ import {
 import Home from "./pages/Home.jsx";
 import Intro from "./pages/Intro.jsx";
 import Layout from "./components/Layout.jsx";
+import Menu from "./pages/Innondation.jsx";
 
 import { CanvasProvider } from "./utils/Context/CanvasContext.jsx";
 
@@ -33,14 +34,14 @@ function App() {
   const router = createHashRouter(
     createRoutesFromElements(
       <Route path="/" element={<Layout />}>
+        <Route path="menu" element={<Menu />} />
         <Route index element={<Intro />} />
-        <Route path="/:id" element={<Home />} />
       </Route>
     ),
     {
       // Ajoutez le chemin de base ici
       /* basename: "/sorbonne/reactQuiz/", */
-      basename: basename,
+      /*      basename: "/papi/3d/", */
     }
   );
   return <RouterProvider router={router} />;
