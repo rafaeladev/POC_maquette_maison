@@ -1,12 +1,15 @@
 import {
   Route,
   RouterProvider,
-  createBrowserRouter,
+  createHashRouter,
   createRoutesFromElements,
 } from "react-router-dom";
 
 import Home from "./pages/Home.jsx";
+import Intro from "./pages/Intro.jsx";
 import Layout from "./components/Layout.jsx";
+
+import { CanvasProvider } from "./utils/Context/CanvasContext.jsx";
 
 // Cette fonction est un exemple et doit être adaptée à votre cas spécifique
 function detectBasename() {
@@ -24,17 +27,20 @@ function detectBasename() {
 }
 
 function App() {
-  /*    console.log(detectBasename()); */
-  const router = createBrowserRouter(
+  const basename = detectBasename();
+  console.log(`Basename detected: ${basename}`);
+
+  const router = createHashRouter(
     createRoutesFromElements(
       <Route path="/" element={<Layout />}>
-        <Route index element={<Home />} />
+        <Route index element={<Intro />} />
+        <Route path="/:id" element={<Home />} />
       </Route>
     ),
     {
       // Ajoutez le chemin de base ici
       /* basename: "/sorbonne/reactQuiz/", */
-      basename: detectBasename(),
+      basename: basename,
     }
   );
   return <RouterProvider router={router} />;

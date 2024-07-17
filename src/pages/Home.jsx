@@ -1,4 +1,4 @@
-import React, { useEffect, useState, Suspense } from "react";
+import React, { useEffect, useState, Suspense, useRef } from "react";
 
 import { Canvas } from "@react-three/fiber";
 import { Leva } from "leva";
@@ -18,7 +18,39 @@ import FadeLoaderComponent from "../components/FadeLoader.jsx";
 
 import { Vector3 } from "three";
 
+import { useLocation, useNavigate, useParams } from "react-router-dom";
+
+// Context
+import { useCanvas } from "../utils/Context/CanvasContext.jsx";
+import { useInView } from "react-intersection-observer";
+
+import { useIntersection } from "react-use";
+const DisableRender = () => useFrame(() => null, 1000);
+
 function Home() {
+  const canvasRef = useCanvas();
+  const useInView = () => {
+    const ref = useRef(null);
+    const threshold = 0.05;
+    const intersection = useIntersection(ref, {
+      root: null,
+      rootMargin: "0px",
+      threshold,
+    });
+
+    return {
+      ref,
+      inView: intersection && intersection.intersectionRatio > threshold,
+    };
+  };
+  const { ref, inView } = useInView();
+
+  console.log("inView", inView);
+
+  const toggleClose = () => {
+    setClose((prev) => !prev);
+  };
+
   const [isScenarioChanged, setIsScenarioChanged] = useState(false);
   const [isWaterMoving, setIsWaterMoving] = useState(false);
   const [isWaterMovingUp, setIsWaterMovingUp] = useState(false);
@@ -128,59 +160,57 @@ function Home() {
       <LoadingBar isLoading={!isLoaded} progress={progress} />
 
       <Leva hidden={true} collapsed={true} />
+      <div className="canvasContainer" ref={ref}>
+        <Canvas
+          shadows={true}
+          flat
+          camera={{
+            fov: 45,
+            near: 0.1,
+            far: 200,
+            position: cameraPosition,
+          }}
+        >
+          {!inView && <DisableRender />}
+          <color attach="background" args={["#302D38"]} />
+          {/*     <Perf position="top-left" /> */}
+          <Environment preset="sunset" intensity={7} />
 
-      {/* <Suspense fallback={<FadeLoaderComponent />}> */}
-      <>
-        <div className="webgl">
-          <Canvas
-            shadows={true}
-            flat
-            camera={{
-              fov: 45,
-              near: 0.1,
-              far: 200,
-              position: cameraPosition,
-            }}
-          >
-            <color attach="background" args={["#302D38"]} />
-            {/*  <Perf position="top-left" /> */}
-            <Environment preset="sunset" intensity={7} />
-
-            <Scene
-              isScenarioChanged={isScenarioChanged}
-              toggleScenario={toggleScenario}
-              toggleAnimation={toggleWaterMoving}
-              toggleWaterMovingUp={toggleWaterMovingUp}
-              isWaterMoving={isWaterMoving}
-              isWaterMovingUp={isWaterMovingUp}
-              toggleReset={toggleReset}
-              isReset={isReset}
-              resetKey={resetKey}
-              cameraPosition={cameraPosition}
-              cameraTarget={cameraTarget}
-              moveCamera={moveCamera}
-              setMoveCamera={toggleCameraPosition}
-              menuButtonClick={menuButtonClick}
-              setIsLoaded={setIsLoaded}
-              setLoadingProgress={setProgress}
-            />
-          </Canvas>
-        </div>
-        <Interface
-          toggleWaterMovingUp={toggleWaterMovingUp}
-          toggleWaterMoving={toggleWaterMoving}
-          isWaterMovingUp={isWaterMovingUp}
-          isWaterMoving={isWaterMoving}
-          isScenarioChanged={isScenarioChanged}
-          handleReset={handleReset}
-          isReset={isReset}
-          toggleReset={toggleReset}
-          handleCameraPositionChange={handleCameraPositionChange}
-          titleScenario={cameraPositions[currentPositionIndex].location}
-        />
-      </>
-      {/* </Suspense> */}
-      {/* )} */}
+          <Scene
+            key={resetKey} // force re-render
+            isScenarioChanged={isScenarioChanged}
+            toggleScenario={toggleScenario}
+            toggleAnimation={toggleWaterMoving}
+            toggleWaterMovingUp={toggleWaterMovingUp}
+            isWaterMoving={isWaterMoving}
+            isWaterMovingUp={isWaterMovingUp}
+            toggleReset={toggleReset}
+            isReset={isReset}
+            resetKey={resetKey}
+            cameraPosition={cameraPosition}
+            cameraTarget={cameraTarget}
+            moveCamera={moveCamera}
+            setMoveCamera={toggleCameraPosition}
+            menuButtonClick={menuButtonClick}
+            setIsLoaded={setIsLoaded}
+            setLoadingProgress={setProgress}
+            inView={inView}
+          />
+        </Canvas>
+      </div>
+      <Interface
+        toggleWaterMovingUp={toggleWaterMovingUp}
+        toggleWaterMoving={toggleWaterMoving}
+        isWaterMovingUp={isWaterMovingUp}
+        isWaterMoving={isWaterMoving}
+        isScenarioChanged={isScenarioChanged}
+        handleReset={handleReset}
+        isReset={isReset}
+        toggleReset={toggleReset}
+        handleCameraPositionChange={handleCameraPositionChange}
+        titleScenario={cameraPositions[currentPositionIndex].location}
+        setClose={toggleClose}
+      />
     </>
   );
 }

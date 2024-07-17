@@ -15,58 +15,14 @@ function Interface(props) {
     props.toggleWaterMovingUp();
   };
 
-  const handleButtonStateChange = (button) => {};
-
   return (
     <div className="scenario_list">
-      <TitleBar scenario="A" sceneName={props.titleScenario} />
-      {/* <div className='scenario_correction'>
-                <button
-                    className=''
-                    onClick={() => {
-                        props.handleCameraPosition('cuisine');
-                        handleButtonStateChange('cuisine');
-                    }}
-                    disabled={buttonsClicked.cuisine}
-                >
-                    Cuisine
-                </button>
-                <button
-                    className=''
-                    onClick={() => {
-                        props.handleCameraPosition('salon');
-                        handleButtonStateChange('salon');
-                    }}
-                    disabled={buttonsClicked.salon}
-                >
-                    Salon
-                </button>
-                <button
-                    className=''
-                    onClick={() => {
-                        props.handleCameraPosition('sdb');
-                        handleButtonStateChange('sdb');
-                    }}
-                    disabled={buttonsClicked.sdb}
-                >
-                    Salle de Bains
-                </button>
-                <button
-                    className=''
-                    onClick={() => {
-                        props.handleCameraPosition('jardin');
-                        handleButtonStateChange('jardin');
-                    }}
-                    disabled={buttonsClicked.jardin}
-                >
-                    Jardin
-                </button>
-            </div> */}
-
+      <TitleBar sceneName={props.titleScenario} />
       <div className="scenario_container">
         <button
           className="button_look_around"
           onClick={() => props.handleCameraPositionChange(-1)}
+          style={{ paddingRight: "0.2rem" }}
         >
           <IoIosArrowBack />
         </button>

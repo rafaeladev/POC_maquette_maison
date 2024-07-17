@@ -3,9 +3,11 @@
 
 // imports React
 import React, { useRef, useEffect, useState, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 
 // imports drei
-import { OrbitControls, useAnimations, Sky } from "@react-three/drei";
+import { OrbitControls, useAnimations, Sky, Html } from "@react-three/drei";
+import { BakeShadows } from "@react-three/drei";
 
 // imports React Three Fiber
 import { useFrame, useLoader } from "@react-three/fiber";
@@ -25,75 +27,45 @@ import { useControls } from "leva";
 
 // imports des utils .js
 import { startAnimation } from "./utils/WaterAnimation.js";
-import { loadTextures } from "./utils/textureLoader.js";
-import textures from "./data/textures.json";
+import useStore from "./utils/store.js";
 
 // Approche  n°2 avec Water from three-stdlib
 import Ocean from "./Ocean.jsx";
 
-// Fonction pour appliquer les textures aux objets
-const applyMaterial = (node, loadedTextures, name) => {
-  let materialOptions;
+import { IoClose } from "react-icons/io5";
 
-  // console.log(name);
-  if (
-    name === "plastique_blanc" ||
-    name === "Plastique_noir" ||
-    name === "plante" ||
-    name === "Cuir"
-  ) {
-    materialOptions = {
-      color:
-        name === "plastique_blanc"
-          ? 0xffffff
-          : name === "Plastique_noir"
-          ? 0x000000
-          : name === "plante"
-          ? 0x6e7d65
-          : 0x3b2517,
-      name: name,
-    };
-  } else {
-    materialOptions = {
-      map: loadedTextures.colorMap || null,
-      normalMap: loadedTextures.normalMap || null,
-      roughnessMap: loadedTextures.roughnessMap || null,
-      metalnessMap: loadedTextures.metalnessMap || null,
-      alphaMap: loadedTextures.alphaMap || null,
-      name: name,
-    };
-  }
+import { useInView } from "react-intersection-observer";
 
-  if (materialOptions.normalMap) {
-    materialOptions.normalMap.wrapS = THREE.RepeatWrapping;
-    materialOptions.normalMap.wrapT = THREE.RepeatWrapping;
-  }
+const DisableRender = () => useFrame(() => null, 1000);
 
-  if (materialOptions.map) {
-    materialOptions.map.wrapS = THREE.RepeatWrapping;
-    materialOptions.map.wrapT = THREE.RepeatWrapping;
-  }
-
-  if (materialOptions.roughnessMap) {
-    materialOptions.roughnessMap.wrapS = THREE.RepeatWrapping;
-    materialOptions.roughnessMap.wrapT = THREE.RepeatWrapping;
-  }
-
-  if (materialOptions.metalnessMap) {
-    materialOptions.metalnessMap.wrapS = THREE.RepeatWrapping;
-    materialOptions.metalnessMap.wrapT = THREE.RepeatWrapping;
-  }
-
-  // if (materialOptions.alphaMap) {
-  //     materialOptions.alphaMap.wrapS = THREE.RepeatWrapping;
-  //     materialOptions.alphaMap.wrapT = THREE.RepeatWrapping;
-  // }
-
-  node.material = new THREE.MeshStandardMaterial(materialOptions);
-  node.material.needsUpdate = true;
+// Fonction pour ajouter des shadows
+const enableShadows = (object) => {
+  /*  let i = 0;
+  object.traverse((child) => {
+    if (child.isMesh) {
+      if (
+        child.material.name !== "terre" &&
+        child.material.name !== "herbe" &&
+        child.material.name !== "beton" &&
+        child.material.name !== "asphalt" &&
+        child.material.name !== "sol_cuisine" &&
+        child.material.name !== "carpet" &&
+        child.material.name !== "sol_salon" &&
+        child.material.name !== "sol_sdb"
+      ) {
+        child.castShadow = true;
+      }
+      child.receiveShadow = true;
+    }
+    i = i + 1;
+  }); */
 };
 
 function Scene(props) {
+  const { ref, inView } = useInView();
+  // Force reload when coming back to the page
+  const [resetKey, setResetKey] = useState(0);
+
   // ---  Debug controls --- //
   // Approche n°1 avec shaderMaterial
   const { Elevation, FrequencyX, FrequencyY, Speed } = useControls(
@@ -127,8 +99,20 @@ function Scene(props) {
       uOpacity: { value: 0.2, min: 0, max: 1, step: 0.01 },
     });
 
-  const { sunPosition } = useControls("Sun", {
+  const {
+    sunPosition,
+    turbidity,
+    rayleigh,
+    mieCoefficient,
+    mieDirectionalG,
+    distance,
+  } = useControls("Sun", {
     sunPosition: { value: [-3.9, 9.9, 10.1], step: 0.1 },
+    turbidity: { value: 4, min: 0, max: 20, step: 0.1 },
+    rayleigh: { value: 3, min: 0, max: 10, step: 0.1 },
+    mieCoefficient: { value: 0.09, min: 0, max: 1, step: 0.01 },
+    mieDirectionalG: { value: 1, min: 0, max: 1, step: 0.01 },
+    distance: { value: 450000, min: 0, max: 1000000, step: 100 },
   });
 
   const orbitControls = useControls("Orbit Controls", {
@@ -147,15 +131,6 @@ function Scene(props) {
     /*  position0: props.cameraPosition, */
   });
 
-  const { dLightPosition, dLightIntensity, dLightTarget } = useControls(
-    "Directional Light",
-    {
-      dLightPosition: { value: [-4.6, 3.2, -7.6], step: 0.1 },
-      dLightIntensity: { value: 0.1, step: 0.1 },
-      dLightTarget: { value: [0, 0, 0] },
-    }
-  );
-
   // ---  Debug controls --- //
 
   // References
@@ -168,7 +143,7 @@ function Scene(props) {
   const orbitControlsRef = useRef();
   const waterMaterialRef = useRef();
   const waterMaterialSideRef = useRef();
-  const overlayMaterialRef = useRef();
+  const sceneRef = useRef();
 
   // -- Overlay material -- //
   const overlayGeometry = new THREE.PlaneGeometry(2, 2, 1, 1);
@@ -195,32 +170,53 @@ function Scene(props) {
   // -- Overlay material -- //
 
   // --- Model --- //
-  const loadingManager = new THREE.LoadingManager();
 
-  loadingManager.onLoad = () => {
-    props.setIsLoaded(true); // Set isLoaded to true when everything is loaded
+  // Function to initialize the LoadingManager
+
+  const initializeLoadingManager = () => {
+    const loadingManager = new THREE.LoadingManager();
+
+    loadingManager.onStart = (url, itemsLoaded, itemsTotal) => {
+      console.log("Loading started");
+    };
+
+    loadingManager.onLoad = () => {
+      props.setIsLoaded(true); // Set isLoaded to true when everything is loaded
+      console.log("Loading complete");
+    };
+
+    loadingManager.onProgress = (url, itemsLoaded, itemsTotal) => {
+      const progress = itemsLoaded / itemsTotal;
+      props.setLoadingProgress(progress); // Update loading progress
+      /* console.log(
+        `Loading file: ${url}. Loaded ${itemsLoaded} of ${itemsTotal} files.`
+      );
+      console.log(progress); */
+    };
+
+    return loadingManager;
   };
 
-  loadingManager.onProgress = (url, itemsLoaded, itemsTotal) => {
-    const progress = itemsLoaded / itemsTotal;
-    props.setLoadingProgress(progress); // Update loading progress
-    /*   console.log(
-      `Loading file: ${url}. Loaded ${itemsLoaded} of ${itemsTotal} files.`
-    );
-    console.log(progress); */
-  };
+  const loadingManagerRef = useRef(initializeLoadingManager());
 
-  // Use the loading manager with useLoader
+  const { nodes, animations } = useMemo(() => {
+    return useLoader(GLTFLoader, "./model/Maquette_v11.glb", (loader) => {
+      loader.manager = loadingManagerRef.current;
+    });
+  }, []);
 
-  const { nodes, animations } = useLoader(
-    GLTFLoader,
-    "./model/Maquette_v9.glb",
-    (loader) => {
-      loader.manager = loadingManager;
-    }
-  );
+  /*   const { nodes, animations } = useMemo(() => {
+    return useLoader(GLTFLoader, "./model/Maquette_v11.glb", (loader) => {
+      loader.manager = loadingManagerRef.current;
+      const dracoLoader = new DRACOLoader();
+      dracoLoader.setDecoderPath("./draco/"); // Assurez-vous que ce chemin est correct
+      loader.setDRACOLoader(dracoLoader);
+    });
+  }, [scenario]); // Reload when the scenario changes */
 
-  console.log("animations : ", animations);
+  // Scenario
+  const scenario = useStore((state) => state.scenario);
+  console.log("scenario : ", scenario);
 
   const maquette_scenario_a_avant = nodes.maquette_scenario_a_avant;
   const maquette_scenario_a_apres = nodes.maquette_scenario_a_apres;
@@ -228,6 +224,51 @@ function Scene(props) {
   const maquette_scenario_b_apres = nodes.maquette_scenario_b_apres;
   const maquette_scenario_c_avant = nodes.maquette_scenario_c_avant;
   const maquette_scenario_c_apres = nodes.maquette_scenario_c_apres;
+
+  // Force reload when pathname changes
+  const [sceneAvant, setSceneAvant] = useState(getSceneForScenarioAvant("A"));
+  const [sceneApres, setSceneApres] = useState(getSceneForScenarioApres("A"));
+  useEffect(() => {
+    setResetKey((prevKey) => prevKey + 1);
+    setSceneAvant(getSceneForScenarioAvant(scenario));
+    setSceneApres(getSceneForScenarioApres(scenario));
+  }, [scenario]); // Force re-render when pathname changes
+
+  function getSceneForScenarioAvant(key) {
+    switch (key) {
+      case "A":
+        return maquette_scenario_a_avant;
+      case "B":
+        return maquette_scenario_b_avant;
+      case "C":
+        return maquette_scenario_c_avant;
+      default:
+        return null; // Case de défaut
+    }
+  }
+
+  function getSceneForScenarioApres(key) {
+    switch (key) {
+      case "A":
+        return maquette_scenario_a_apres;
+      case "B":
+        return maquette_scenario_b_apres;
+      case "C":
+        return maquette_scenario_c_apres;
+      default:
+        return null; // Case de défaut
+    }
+  }
+
+  const numberOfChildren = maquette_scenario_a_avant.children.length;
+
+  useEffect(() => {
+    if (!props.isScenarioChanged) {
+      enableShadows(getSceneForScenarioAvant(props.scenario), numberOfChildren);
+    } else {
+      enableShadows(getSceneForScenarioApres(props.scenario), numberOfChildren);
+    }
+  }, [props.isScenarioChanged, props.scenario]);
 
   /*   const gltf = useLoader(
     GLTFLoader,
@@ -430,28 +471,23 @@ function Scene(props) {
   // Animations montée de l'eau
   const [showCoteMeshes, setShowCoteMeshes] = useState(false);
 
-  // Scenario
-  const [scenario, setScenario] = useState("A");
-
   const animationNames = [
     "eau_exterieur_scenario_abc_montee",
-    "eau_piscine_scenario_abc_montee",
-    "eau_piscine_scenario_abc_montee",
-    "eau_exterieur_scenario_abc_montee",
+    "eau_exterieur_cote_scenario_abc_montee",
+    "eau_interieur_cote_scenario_a_montee",
     "eau_interieur_scenario_a_montee",
-    "eau_interieur_scenario_a_montee",
+    "eau_piscine_cote_scenario_abc_montee",
+    "eau_piscine_scenario_abc_montee",
   ];
 
   const animationsClips = [
     useAnimations(animations, nodes.eau_exterieur),
-    useAnimations(animations, nodes.eau_piscine),
-    useAnimations(animations, nodes.eau_piscine_cote),
     useAnimations(animations, nodes.eau_exterieur_cote),
     useAnimations(animations, nodes.eau_interieur_cote),
     useAnimations(animations, nodes.eau_interieur),
+    useAnimations(animations, nodes.eau_piscine_cote),
+    useAnimations(animations, nodes.eau_piscine),
   ];
-
-  console.log(animationsClips);
 
   // Animation de l'eau avec useEffect pour gérer les déclenchements
   useEffect(() => {
@@ -475,7 +511,6 @@ function Scene(props) {
         props.toggleScenario(true);
         props.toggleAnimation(false);
 
-        props.toggleTextures(true);
         if (waterMaterialRef.current) {
           waterMaterialRef.current.uniforms.uDepthColor.value.set("#b0a997");
           waterMaterialRef.current.uniforms.uSurfaceColor.value.set("#e3cfcf");
@@ -533,7 +568,8 @@ function Scene(props) {
   // --- Render --- //
   return (
     <>
-      {/*  <BakeShadows /> */}
+      {/*  {!inView && DisableRender()} */}
+      <BakeShadows />
       {/*   <SoftShadows size={5} samples={20} focus={0} /> */}
       <OrbitControls
         ref={orbitControlsRef}
@@ -560,7 +596,19 @@ function Scene(props) {
         shadow-camera-left={-10}
         color={0xffd0b5}
       />
-      <Sky sunPosition={sunPosition} />
+      <Sky
+        sunPosition={sunPosition}
+        turbidity={turbidity}
+        rayleigh={rayleigh}
+        mieCoefficient={mieCoefficient}
+        mieDirectionalG={mieDirectionalG}
+        distance={distance}
+      />
+      {/*    <Html>
+        <button className="title_bar_closeIcon" onClick={handleWindowClose}>
+          <IoClose />
+        </button>
+      </Html> */}
       {/* Affichage du modèle */}
       {Object.keys(nodes).map((key) => {
         if (
@@ -622,20 +670,18 @@ function Scene(props) {
         }
         return null;
       })}
-      <mesh
-        geometry={overlayGeometry}
-        material={overlayMaterial}
-        ref={overlayMaterialRef}
-      />
+
       <primitive object={nodes.maquette_plan} />
-      <primitive
-        key={props.resetKey} // Use resetKey to force re-render
-        object={
-          props.isScenarioChanged
-            ? maquette_scenario_a_apres
-            : maquette_scenario_a_avant
-        }
-      />
+
+      {props.inView && (
+        <primitive
+          key={props.resetKey} // Use resetKey to force re-render
+          ref={sceneRef}
+          object={props.isScenarioChanged ? sceneApres : sceneAvant}
+          castShadow
+          receiveShadow
+        />
+      )}
     </>
   );
 }
